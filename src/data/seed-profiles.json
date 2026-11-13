@@ -1,0 +1,1967 @@
+[
+  {
+    "x_user_id": "1483927461023",
+    "username": "jane_robotics",
+    "display_name": "Jane Chen 🤖",
+    "bio": "Building autonomous manipulation at RoboSEA | Ex-Google Brain | NUS PhD | Singapore 🇸🇬",
+    "location": "Singapore",
+    "follower_count": 4200,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=jane_robotics",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293847293",
+        "text": "Just shipped v2 of our grasping policy — 94% success rate on novel objects. Foundation models + sim2real transfer is the unlock.",
+        "created_at": "2026-11-10T09:14:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1846182736182736182",
+        "text": "Hiring ML engineers in Singapore for robotic manipulation. DM me if interested in embodied AI!",
+        "created_at": "2026-11-08T14:30:00Z",
+        "metrics": {
+          "likes": 45,
+          "retweets": 18,
+          "replies": 7
+        }
+      },
+      {
+        "tweet_id": "1845926384719283746",
+        "text": "Our NeurIPS workshop paper on dexterous grasping got accepted! Will present in Vancouver 🎉",
+        "created_at": "2026-11-07T11:20:00Z",
+        "metrics": {
+          "likes": 156,
+          "retweets": 41,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1845182736485738291",
+        "text": "The gap between sim and real in manipulation is closing fast. 2 years ago we needed 10x more real data.",
+        "created_at": "2026-11-06T16:45:00Z",
+        "metrics": {
+          "likes": 67,
+          "retweets": 12,
+          "replies": 8
+        }
+      },
+      {
+        "tweet_id": "1844736182937461023",
+        "text": "Weekend hacking: got our robot arm to fold towels consistently with zero hardcoded trajectories.",
+        "created_at": "2026-11-05T20:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 56,
+          "replies": 31
+        }
+      }
+    ],
+    "pinned_tweet": {
+      "tweet_id": "1840293847293847293",
+      "text": "We're building the next generation of dexterous robots at RoboSEA. Seed-funded, hiring, and shipping in SEA. 🤖🇸🇬",
+      "created_at": "2026-10-15T08:00:00Z",
+      "metrics": {
+        "likes": 412,
+        "retweets": 89,
+        "replies": 45
+      }
+    },
+    "discovery_source": "search:embodied AI"
+  },
+  {
+    "x_user_id": "1529384756102938",
+    "username": "aditya_llminfra",
+    "display_name": "Aditya Rao",
+    "bio": "CTO & Co-founder @InferenceHQ — low-latency GPU serving for SEA startups | ex-Grab ML Platform | Singapore",
+    "location": "Singapore",
+    "follower_count": 8700,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=aditya_llminfra",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847829374628394827",
+        "text": "InferenceHQ now serves 2B tokens/day across 15 SEA startups. Our multi-region GPU scheduler cut p99 latency to 120ms.",
+        "created_at": "2026-11-11T03:00:00Z",
+        "metrics": {
+          "likes": 134,
+          "retweets": 45,
+          "replies": 22
+        }
+      },
+      {
+        "tweet_id": "1846738291038471923",
+        "text": "Hot take: most SEA startups don't need their own GPU cluster. They need a smart inference layer that auto-routes to spot instances.",
+        "created_at": "2026-11-09T10:15:00Z",
+        "metrics": {
+          "likes": 203,
+          "retweets": 67,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1845928374619283746",
+        "text": "Benchmarked model serving on local SG nodes vs US-West. Routing traffic locally saves 180ms round-trip.",
+        "created_at": "2026-11-07T15:30:00Z",
+        "metrics": {
+          "likes": 312,
+          "retweets": 98,
+          "replies": 41
+        }
+      },
+      {
+        "tweet_id": "1845182736192837461",
+        "text": "We just closed our pre-seed round from top SEA angels! Building the foundational compute layer here.",
+        "created_at": "2026-11-06T09:00:00Z",
+        "metrics": {
+          "likes": 567,
+          "retweets": 123,
+          "replies": 78
+        }
+      },
+      {
+        "tweet_id": "1844293847102938475",
+        "text": "Open-sourcing our speculative decoding proxy for vLLM today. Link in bio!",
+        "created_at": "2026-11-05T14:00:00Z",
+        "metrics": {
+          "likes": 189,
+          "retweets": 53,
+          "replies": 21
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "1638472910384756",
+    "username": "linh_devtools",
+    "display_name": "Linh Nguyen 🛠️",
+    "bio": "Founder @CodeForge — AI code review for Vietnamese & SEA dev teams | YC W26 | prev. eng @Shopee | HCMUT",
+    "location": "Ho Chi Minh City, Vietnam",
+    "follower_count": 3100,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=linh_devtools",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293123456",
+        "text": "CodeForge now handles mixed Vietnamese-English technical vernacular natively in code reviews.",
+        "created_at": "2026-11-10T07:00:00Z",
+        "metrics": {
+          "likes": 78,
+          "retweets": 19,
+          "replies": 8
+        }
+      },
+      {
+        "tweet_id": "1846293847293847293",
+        "text": "We onboarded 5 engineering teams across Saigon and Da Nang this week. SEA dev tooling adoption is surging.",
+        "created_at": "2026-11-08T11:00:00Z",
+        "metrics": {
+          "likes": 123,
+          "retweets": 34,
+          "replies": 15
+        }
+      },
+      {
+        "tweet_id": "1845847293847293847",
+        "text": "Building developer tools in Southeast Asia is huge — 500k+ active developers and growing 25% YoY.",
+        "created_at": "2026-11-07T09:30:00Z",
+        "metrics": {
+          "likes": 201,
+          "retweets": 56,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1844738291038291038",
+        "text": "Our AST-augmented context engine reduces hallucinated code comments to under 1.2%.",
+        "created_at": "2026-11-06T02:00:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 32,
+          "replies": 17
+        }
+      },
+      {
+        "tweet_id": "1844192837461923847",
+        "text": "Hiring 2 full-stack Rust/TS engineers in HCMC to help scale our semantic code graph.",
+        "created_at": "2026-11-05T08:00:00Z",
+        "metrics": {
+          "likes": 97,
+          "retweets": 25,
+          "replies": 14
+        }
+      }
+    ],
+    "pinned_tweet": {
+      "tweet_id": "1840192837461923847",
+      "text": "Excited to announce CodeForge is in YC W26! Bringing intelligent developer tooling to Vietnam & SEA 🇻🇳🚀",
+      "created_at": "2026-10-01T08:00:00Z",
+      "metrics": {
+        "likes": 890,
+        "retweets": 234,
+        "replies": 112
+      }
+    },
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "1967482910384756",
+    "username": "marco_autonomy",
+    "display_name": "Marco Santos 🚗",
+    "bio": "Founder @DriveAI_PH — autonomous delivery vehicles for Philippine urban logistics | ex-Tesla Autopilot | UP Diliman",
+    "location": "Manila, Philippines",
+    "follower_count": 2900,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=marco_autonomy",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847738291038471923",
+        "text": "DriveAI's autonomous delivery bot completed 1,000 deliveries in BGC with zero human interventions.",
+        "created_at": "2026-11-11T01:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 67,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1846293847293123456",
+        "text": "Unstructured tropical urban traffic requires vision-language models for edge-case reasoning, not just classical SLAM.",
+        "created_at": "2026-11-09T08:00:00Z",
+        "metrics": {
+          "likes": 345,
+          "retweets": 98,
+          "replies": 45
+        }
+      },
+      {
+        "tweet_id": "1845829374619283746",
+        "text": "Partnered with a top regional courier to pilot 20 robotic delivery pods in metro Manila next month.",
+        "created_at": "2026-11-07T14:00:00Z",
+        "metrics": {
+          "likes": 189,
+          "retweets": 56,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1844738291038291038",
+        "text": "Hiring embedded robotics engineers in Manila. We build custom hardware and real-time control stacks.",
+        "created_at": "2026-11-06T03:00:00Z",
+        "metrics": {
+          "likes": 78,
+          "retweets": 23,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1844192837461923123",
+        "text": "Filipino hardware and robotics talent is world-class. Time to build homegrown deeptech ventures.",
+        "created_at": "2026-11-05T09:00:00Z",
+        "metrics": {
+          "likes": 267,
+          "retweets": 78,
+          "replies": 34
+        }
+      }
+    ],
+    "pinned_tweet": {
+      "tweet_id": "1840738291038471923",
+      "text": "DriveAI: Autonomous last-mile delivery for Southeast Asia 🇵🇭 Building from Manila for the region.",
+      "created_at": "2026-10-10T08:00:00Z",
+      "metrics": {
+        "likes": 567,
+        "retweets": 145,
+        "replies": 78
+      }
+    },
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "2078293847102939",
+    "username": "chayan_botics",
+    "display_name": "Chayan Somboon 🇹🇭",
+    "bio": "Co-Founder & CEO @AgriBotix — agricultural robotics & drone swarms for Southeast Asian farmers | Chulalongkorn Eng",
+    "location": "Bangkok, Thailand",
+    "follower_count": 5100,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=chayan_botics",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847192837461923991",
+        "text": "Our weed-picking field robot now covers 5 hectares/day using on-device vision models. 80% herbicide reduction.",
+        "created_at": "2026-11-10T04:20:00Z",
+        "metrics": {
+          "likes": 142,
+          "retweets": 38,
+          "replies": 16
+        }
+      },
+      {
+        "tweet_id": "1846392837461923112",
+        "text": "Agritech in Thailand is reaching an inflection point due to rural labor shortages. Robotics is no longer a luxury.",
+        "created_at": "2026-11-08T12:00:00Z",
+        "metrics": {
+          "likes": 198,
+          "retweets": 52,
+          "replies": 24
+        }
+      },
+      {
+        "tweet_id": "1845192837461923883",
+        "text": "Deployed 15 autonomous harvesters across Suphan Buri this harvest cycle. Farmer feedback has been incredible.",
+        "created_at": "2026-11-06T15:10:00Z",
+        "metrics": {
+          "likes": 215,
+          "retweets": 49,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1844892837461923774",
+        "text": "Raising our seed round to scale manufacturing in Rayong. If you invest in robotics/climate tech in SEA, let's talk.",
+        "created_at": "2026-11-05T09:30:00Z",
+        "metrics": {
+          "likes": 320,
+          "retweets": 84,
+          "replies": 42
+        }
+      },
+      {
+        "tweet_id": "1843992837461923665",
+        "text": "Field robotics lesson #1: dust, humidity, and heat test hardware harder than any lab benchmark.",
+        "created_at": "2026-11-04T11:00:00Z",
+        "metrics": {
+          "likes": 110,
+          "retweets": 24,
+          "replies": 11
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "2189384756102940",
+    "username": "rizky_agentic",
+    "display_name": "Rizky Pratama ⚡",
+    "bio": "Founder @NusantaraAI — building multi-agent workflow orchestration for Indonesian enterprises | ex-Gojek Staff Eng",
+    "location": "Jakarta, Indonesia",
+    "follower_count": 6400,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=rizky_agentic",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847392837461923441",
+        "text": "Just pushed v1 of our deterministic agent guardrail engine. Zero unexpected tool calls in 100k production runs.",
+        "created_at": "2026-11-10T10:15:00Z",
+        "metrics": {
+          "likes": 187,
+          "retweets": 51,
+          "replies": 28
+        }
+      },
+      {
+        "tweet_id": "1846592837461923552",
+        "text": "Indonesian enterprises don't want general chatbots. They want reliable autonomous agents linked to their SQL DBs and SAP.",
+        "created_at": "2026-11-09T03:40:00Z",
+        "metrics": {
+          "likes": 304,
+          "retweets": 88,
+          "replies": 49
+        }
+      },
+      {
+        "tweet_id": "1845492837461923663",
+        "text": "NusantaraAI just signed our 3rd banking client in Jakarta. Fast ARR growth without heavy ad spend.",
+        "created_at": "2026-11-07T08:12:00Z",
+        "metrics": {
+          "likes": 412,
+          "retweets": 93,
+          "replies": 56
+        }
+      },
+      {
+        "tweet_id": "1844392837461923774",
+        "text": "Benchmarked token consumption across multi-agent loops. Structured state machines beat free-form chat loops every time.",
+        "created_at": "2026-11-05T14:22:00Z",
+        "metrics": {
+          "likes": 156,
+          "retweets": 42,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1843592837461923885",
+        "text": "We are actively hiring 2 backend engineers with Golang + vector database experience in Jakarta!",
+        "created_at": "2026-11-04T07:05:00Z",
+        "metrics": {
+          "likes": 88,
+          "retweets": 29,
+          "replies": 12
+        }
+      }
+    ],
+    "pinned_tweet": {
+      "tweet_id": "1841392837461923999",
+      "text": "Empowering Southeast Asian enterprises with verifiable AI agents. NusantaraAI is live 🇮🇩🚀",
+      "created_at": "2026-10-18T04:00:00Z",
+      "metrics": {
+        "likes": 620,
+        "retweets": 175,
+        "replies": 84
+      }
+    },
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "2298473810293841",
+    "username": "viet_quantized",
+    "display_name": "Viet Tran 🧠",
+    "bio": "Co-Founder @MicroLLM — 1-bit & 2-bit quantization for edge devices | PhD Hanoi University of Science & Tech",
+    "location": "Hanoi, Vietnam",
+    "follower_count": 4800,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=viet_quantized",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847492837461923101",
+        "text": "Achieved 38 tokens/sec running an 8B model on Raspberry Pi 5 with our ternary kernel. Benchmark repo released!",
+        "created_at": "2026-11-10T16:30:00Z",
+        "metrics": {
+          "likes": 410,
+          "retweets": 122,
+          "replies": 63
+        }
+      },
+      {
+        "tweet_id": "1846692837461923202",
+        "text": "Why pay $0.01 per cloud call when local silicon can handle 90% of summarization tasks under 5 watts?",
+        "created_at": "2026-11-09T08:15:00Z",
+        "metrics": {
+          "likes": 255,
+          "retweets": 71,
+          "replies": 33
+        }
+      },
+      {
+        "tweet_id": "1845892837461923303",
+        "text": "Incorporated MicroLLM in Singapore to service hardware OEMs across Vietnam, Taiwan, and Japan.",
+        "created_at": "2026-11-07T11:45:00Z",
+        "metrics": {
+          "likes": 180,
+          "retweets": 44,
+          "replies": 21
+        }
+      },
+      {
+        "tweet_id": "1844992837461923404",
+        "text": "Simd optimizations on ARM Cortex-A76 yielded an extra 2.4x speedup for our quantization library.",
+        "created_at": "2026-11-06T06:10:00Z",
+        "metrics": {
+          "likes": 135,
+          "retweets": 36,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1844192837461923505",
+        "text": "Looking for pre-seed investors who understand low-level systems and edge AI economics in SEA.",
+        "created_at": "2026-11-05T13:20:00Z",
+        "metrics": {
+          "likes": 290,
+          "retweets": 81,
+          "replies": 47
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:embodied AI"
+  },
+  {
+    "x_user_id": "2398473810293842",
+    "username": "hafiz_droneflow",
+    "display_name": "Hafiz Zulkifli 🛸",
+    "bio": "Founder @DroneFlow_MY — autonomous drone inspection pipelines for offshore oil rigs & renewables | Ex-Petronas | KL",
+    "location": "Kuala Lumpur, Malaysia",
+    "follower_count": 3600,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=hafiz_droneflow",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847592837461923601",
+        "text": "Our inspection drones completed 40 autonomous wind turbine scans off the Terengganu coast. Defect detection precision at 98.4%.",
+        "created_at": "2026-11-10T12:00:00Z",
+        "metrics": {
+          "likes": 165,
+          "retweets": 43,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1846792837461923702",
+        "text": "Offshore inspection used to risk human lives on scaffolding. Robotics transforms industrial safety and ROI simultaneously.",
+        "created_at": "2026-11-09T05:30:00Z",
+        "metrics": {
+          "likes": 240,
+          "retweets": 62,
+          "replies": 28
+        }
+      },
+      {
+        "tweet_id": "1845992837461923803",
+        "text": "DroneFlow raised $750k pre-seed to expand our autonomous fleet into Indonesia and Brunei.",
+        "created_at": "2026-11-07T14:10:00Z",
+        "metrics": {
+          "likes": 512,
+          "retweets": 110,
+          "replies": 65
+        }
+      },
+      {
+        "tweet_id": "1845192837461923904",
+        "text": "We built our custom visual SLAM pipeline to operate in GPS-denied environments underneath offshore platforms.",
+        "created_at": "2026-11-06T09:40:00Z",
+        "metrics": {
+          "likes": 178,
+          "retweets": 47,
+          "replies": 22
+        }
+      },
+      {
+        "tweet_id": "1844292837461923005",
+        "text": "Hiring 2 computer vision specialists in Kuala Lumpur with PyTorch + ROS2 experience!",
+        "created_at": "2026-11-05T03:50:00Z",
+        "metrics": {
+          "likes": 92,
+          "retweets": 28,
+          "replies": 15
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "2498473810293843",
+    "username": "nadia_synthbio",
+    "display_name": "Dr. Nadia Tan 🔬",
+    "bio": "CEO & Co-Founder @AcuBiotech — Generative AI for enzyme design & sustainable biomanufacturing | NTU PhD | Singapore",
+    "location": "Singapore",
+    "follower_count": 5900,
+    "verified": true,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=nadia_synthbio",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847692837461923101",
+        "text": "Our diffusion model designed 3 novel plastic-degrading enzymes that showed catalytic activity in wet lab validation today!",
+        "created_at": "2026-11-10T14:25:00Z",
+        "metrics": {
+          "likes": 388,
+          "retweets": 99,
+          "replies": 44
+        }
+      },
+      {
+        "tweet_id": "1846892837461923202",
+        "text": "Bio-AI is the next frontier of applied machine learning in Southeast Asia. The biodiversity data here is unprecedented.",
+        "created_at": "2026-11-09T09:00:00Z",
+        "metrics": {
+          "likes": 215,
+          "retweets": 54,
+          "replies": 27
+        }
+      },
+      {
+        "tweet_id": "1845792837461923303",
+        "text": "Proud to share that AcuBiotech has been selected for the SGInnovate Deep Tech Catalyst program.",
+        "created_at": "2026-11-07T07:30:00Z",
+        "metrics": {
+          "likes": 310,
+          "retweets": 68,
+          "replies": 39
+        }
+      },
+      {
+        "tweet_id": "1844892837461923404",
+        "text": "Combining structure prediction models with automated robotic liquid handlers speeds up experimental cycles 10x.",
+        "created_at": "2026-11-06T11:15:00Z",
+        "metrics": {
+          "likes": 175,
+          "retweets": 41,
+          "replies": 18
+        }
+      },
+      {
+        "tweet_id": "1843992837461923505",
+        "text": "Speaking on AI in Synthetic Biology at the Singapore Week of Innovation and Technology next week.",
+        "created_at": "2026-11-05T02:00:00Z",
+        "metrics": {
+          "likes": 140,
+          "retweets": 30,
+          "replies": 12
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:embodied AI"
+  },
+  {
+    "x_user_id": "2598473810293844",
+    "username": "ken_devmesh",
+    "display_name": "Ken Lim ⚡",
+    "bio": "Founder @DevMesh — local LLM gateway & cost guardrails for developers | ex-Grab Principal Eng | Singapore",
+    "location": "Singapore",
+    "follower_count": 7300,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ken_devmesh",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847792837461923601",
+        "text": "DevMesh now routes 10M requests daily, automatically falling back between local models and frontier APIs to cut billings 60%.",
+        "created_at": "2026-11-11T02:10:00Z",
+        "metrics": {
+          "likes": 290,
+          "retweets": 74,
+          "replies": 38
+        }
+      },
+      {
+        "tweet_id": "1846992837461923702",
+        "text": "Stop hardcoding OpenAI API calls in production apps without token budgets and semantic caching.",
+        "created_at": "2026-11-09T11:45:00Z",
+        "metrics": {
+          "likes": 415,
+          "retweets": 105,
+          "replies": 52
+        }
+      },
+      {
+        "tweet_id": "1846092837461923803",
+        "text": "Just released our open-source proxy plugin for Next.js. Feedback appreciated!",
+        "created_at": "2026-11-08T04:20:00Z",
+        "metrics": {
+          "likes": 198,
+          "retweets": 48,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1845192837461923904",
+        "text": "Closing our $1.2M seed round this week. Immensely grateful to our developer community across SEA.",
+        "created_at": "2026-11-06T13:50:00Z",
+        "metrics": {
+          "likes": 630,
+          "retweets": 142,
+          "replies": 89
+        }
+      },
+      {
+        "tweet_id": "1844392837461923005",
+        "text": "Looking for a Founding DevRel engineer in Singapore or remote SEA to build sample integrations and tutorials.",
+        "created_at": "2026-11-05T08:30:00Z",
+        "metrics": {
+          "likes": 112,
+          "retweets": 35,
+          "replies": 19
+        }
+      }
+    ],
+    "pinned_tweet": {
+      "tweet_id": "1841792837461923999",
+      "text": "Build reliable AI applications without surprise $10k monthly cloud bills. Check out DevMesh ⚡",
+      "created_at": "2026-10-22T08:00:00Z",
+      "metrics": {
+        "likes": 780,
+        "retweets": 210,
+        "replies": 95
+      }
+    },
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "2698473810293845",
+    "username": "putri_cv",
+    "display_name": "Putri Wibowo",
+    "bio": "Computer Vision Researcher @ ITB Bandung | Satellite & drone imagery analysis | Bandung, Indonesia 🇮🇩",
+    "location": "Bandung, Indonesia",
+    "follower_count": 1800,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=putri_cv",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847483927461023847",
+        "text": "New pre-print: our segmentation model detects agricultural canopy disease with 91% accuracy from drone captures.",
+        "created_at": "2026-11-10T04:00:00Z",
+        "metrics": {
+          "likes": 56,
+          "retweets": 15,
+          "replies": 8
+        }
+      },
+      {
+        "tweet_id": "1846192837461923847",
+        "text": "Teaching a CV workshop at ITB this weekend. 60 students signed up. Passion for AI among Indonesian students is inspiring.",
+        "created_at": "2026-11-08T06:00:00Z",
+        "metrics": {
+          "likes": 34,
+          "retweets": 8,
+          "replies": 5
+        }
+      },
+      {
+        "tweet_id": "1845738291038471923",
+        "text": "Exploring commercial applications for our multispectral drone mapping models. Many agritech firms reach out.",
+        "created_at": "2026-11-07T13:00:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1844829374619283746",
+        "text": "Indonesia has vast agricultural land. Smart drone monitoring could boost smallholder yield significantly.",
+        "created_at": "2026-11-06T05:00:00Z",
+        "metrics": {
+          "likes": 123,
+          "retweets": 34,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1844293847293847293",
+        "text": "Academic GPU availability in Indonesia remains limited. Collaborations with industry labs are essential.",
+        "created_at": "2026-11-05T10:00:00Z",
+        "metrics": {
+          "likes": 45,
+          "retweets": 12,
+          "replies": 7
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "2798473810293846",
+    "username": "kai_mlops",
+    "display_name": "Kai Tanaka 🇹🇭",
+    "bio": "MLOps Lead @LINE Thailand | Building reliable ML pipelines at scale | Kubeflow, Ray, Triton | Bangkok",
+    "location": "Bangkok, Thailand",
+    "follower_count": 5600,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=kai_mlops",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847192837461923847",
+        "text": "Deployed a feature store serving 50M inference queries/day at LINE Thailand. Caching reduced latency by 35%.",
+        "created_at": "2026-11-10T05:00:00Z",
+        "metrics": {
+          "likes": 78,
+          "retweets": 23,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1846483927461023847",
+        "text": "Production ML engineering requires strong DevOps foundations. Model weights are easy, pipeline orchestration is hard.",
+        "created_at": "2026-11-09T03:00:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 45,
+          "replies": 18
+        }
+      },
+      {
+        "tweet_id": "1845293847293847293",
+        "text": "Our Triton server cluster cut GPU memory fragmentation in half during peak chat load hours.",
+        "created_at": "2026-11-07T08:00:00Z",
+        "metrics": {
+          "likes": 201,
+          "retweets": 56,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1844829374628394827",
+        "text": "Delighted to speak on MLOps best practices at PyCon Thailand next month. Catch me there!",
+        "created_at": "2026-11-06T12:00:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 11
+        }
+      },
+      {
+        "tweet_id": "1844192837461028394",
+        "text": "Evaluating serverless GPU options for sporadic batch inference jobs. Trade-offs between cold-starts and reserved cost.",
+        "created_at": "2026-11-05T07:00:00Z",
+        "metrics": {
+          "likes": 67,
+          "retweets": 18,
+          "replies": 8
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "2898473810293847",
+    "username": "siti_nlp",
+    "display_name": "Siti Aminah 🇲🇾",
+    "bio": "NLP researcher @ Universiti Malaya | Low-resource language models for Bahasa Melayu | Kuala Lumpur",
+    "location": "Kuala Lumpur, Malaysia",
+    "follower_count": 2100,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=siti_nlp",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847483927461028394",
+        "text": "Released Malay-GPT v0.3 — handles code-switching between Malay and English accurately in dialogue tasks.",
+        "created_at": "2026-11-10T06:00:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 45,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1846829374619283746",
+        "text": "300M+ Austronesian language speakers remain under-represented in foundation model pre-training corpora.",
+        "created_at": "2026-11-09T04:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 78,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1845483927461023847",
+        "text": "Evaluating alignment methods for multilingual models. Direct Preference Optimization yields cleaner cultural nuances.",
+        "created_at": "2026-11-07T10:00:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 11
+        }
+      },
+      {
+        "tweet_id": "1844483927461023847",
+        "text": "Looking forward to sharing our findings at EMNLP regional workshop next quarter.",
+        "created_at": "2026-11-06T07:00:00Z",
+        "metrics": {
+          "likes": 167,
+          "retweets": 45,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1844192837461923847",
+        "text": "Open dataset for Malaysian legal NLP will be published on HuggingFace by end of week.",
+        "created_at": "2026-11-05T11:00:00Z",
+        "metrics": {
+          "likes": 201,
+          "retweets": 56,
+          "replies": 29
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "2998473810293848",
+    "username": "tran_edge_ai",
+    "display_name": "Tran Minh Duc",
+    "bio": "Senior Edge AI Engineer @ Samsung Vietnam | TinyML, on-device neural processing | Hanoi",
+    "location": "Hanoi, Vietnam",
+    "follower_count": 1400,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=tran_edge_ai",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847102938475",
+        "text": "Ported object detection to run at 35 FPS on custom NPU hardware with integer-only quantization.",
+        "created_at": "2026-11-10T08:00:00Z",
+        "metrics": {
+          "likes": 56,
+          "retweets": 15,
+          "replies": 6
+        }
+      },
+      {
+        "tweet_id": "1846192837461923123",
+        "text": "Edge AI brings immediate benefits to factory IoT and smart cameras without ongoing cloud egress fees.",
+        "created_at": "2026-11-08T05:00:00Z",
+        "metrics": {
+          "likes": 112,
+          "retweets": 34,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1845293847293123456",
+        "text": "Compiled TinyML benchmarks comparing microcontrollers for speech keyword spotting.",
+        "created_at": "2026-11-07T06:00:00Z",
+        "metrics": {
+          "likes": 78,
+          "retweets": 23,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1844829374619283123",
+        "text": "Experimenting with wake-word detection in Vietnamese using less than 120KB of SRAM.",
+        "created_at": "2026-11-06T14:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 67,
+          "replies": 28
+        }
+      },
+      {
+        "tweet_id": "1844293847102938123",
+        "text": "The hardware engineering ecosystem in Northern Vietnam is maturing remarkably fast.",
+        "created_at": "2026-11-05T03:00:00Z",
+        "metrics": {
+          "likes": 45,
+          "retweets": 12,
+          "replies": 7
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:embodied AI"
+  },
+  {
+    "x_user_id": "3098473810293849",
+    "username": "gabriel_robotics_sg",
+    "display_name": "Gabriel Koh 🤖",
+    "bio": "Robotics Research Fellow @ NTU Singapore | Autonomous mobile robots (AMR) & indoor SLAM | Singapore",
+    "location": "Singapore",
+    "follower_count": 2400,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=gabriel_robotics_sg",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847192837461923001",
+        "text": "Testing multi-floor LiDAR SLAM in hospital logistics corridors. Occlusions from moving hospital beds remain tricky.",
+        "created_at": "2026-11-10T03:15:00Z",
+        "metrics": {
+          "likes": 92,
+          "retweets": 21,
+          "replies": 11
+        }
+      },
+      {
+        "tweet_id": "1846392837461923002",
+        "text": "ROS2 Galactic vs Humble: migration notes and DDS middleware tuning for high-bandwidth point clouds. Thread 🧵",
+        "created_at": "2026-11-08T09:40:00Z",
+        "metrics": {
+          "likes": 165,
+          "retweets": 48,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1845592837461923003",
+        "text": "Great discussion with local health tech leaders on automating sterile room deliveries with mobile manipulators.",
+        "created_at": "2026-11-07T05:20:00Z",
+        "metrics": {
+          "likes": 78,
+          "retweets": 18,
+          "replies": 7
+        }
+      },
+      {
+        "tweet_id": "1844792837461923004",
+        "text": "Our lab's paper on semantic topological mapping received best paper nomination at IROS 2026!",
+        "created_at": "2026-11-06T12:00:00Z",
+        "metrics": {
+          "likes": 310,
+          "retweets": 74,
+          "replies": 32
+        }
+      },
+      {
+        "tweet_id": "1843992837461923005",
+        "text": "Considering exploring commercial spin-out opportunities for indoor AMR navigation software.",
+        "created_at": "2026-11-05T08:10:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 35,
+          "replies": 21
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "3198473810293850",
+    "username": "somchai_infra",
+    "display_name": "Somchai Prasert",
+    "bio": "Senior Infrastructure Engineer @ Agoda | Kubernetes, distributed tracing, GPU allocation | Bangkok 🇹🇭",
+    "location": "Bangkok, Thailand",
+    "follower_count": 3800,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=somchai_infra",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847292837461923011",
+        "text": "Tuning Envoy proxy sidecars for gRPC streaming between our ML search ranking models.",
+        "created_at": "2026-11-10T11:00:00Z",
+        "metrics": {
+          "likes": 64,
+          "retweets": 17,
+          "replies": 6
+        }
+      },
+      {
+        "tweet_id": "1846492837461923012",
+        "text": "Managing 800+ K8s nodes across Southeast Asia data centers teaches you to respect network partition edge cases.",
+        "created_at": "2026-11-09T06:20:00Z",
+        "metrics": {
+          "likes": 210,
+          "retweets": 58,
+          "replies": 25
+        }
+      },
+      {
+        "tweet_id": "1845692837461923013",
+        "text": "Cost comparison of reserved GPU instances vs dynamic autoscaling for internal semantic search workloads.",
+        "created_at": "2026-11-07T14:45:00Z",
+        "metrics": {
+          "likes": 135,
+          "retweets": 39,
+          "replies": 16
+        }
+      },
+      {
+        "tweet_id": "1844892837461923014",
+        "text": "Organizing Bangkok Cloud Native meetup next Thursday. Topic: OpenTelemetry for AI services.",
+        "created_at": "2026-11-06T08:15:00Z",
+        "metrics": {
+          "likes": 88,
+          "retweets": 24,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1844092837461923015",
+        "text": "Automated rolling updates without dropping active WebSocket connections in production.",
+        "created_at": "2026-11-05T04:30:00Z",
+        "metrics": {
+          "likes": 72,
+          "retweets": 16,
+          "replies": 8
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "3298473810293851",
+    "username": "ananya_dl",
+    "display_name": "Ananya Sharma 👩‍💻",
+    "bio": "Lead Deep Learning Scientist @ Sea Group | Recommendation systems & Multimodal search | Singapore",
+    "location": "Singapore",
+    "follower_count": 4500,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ananya_dl",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847392837461923021",
+        "text": "Incorporating multimodal image-text embeddings improved product recommendation relevance by 4.2% across Shopee.",
+        "created_at": "2026-11-10T13:40:00Z",
+        "metrics": {
+          "likes": 155,
+          "retweets": 38,
+          "replies": 17
+        }
+      },
+      {
+        "tweet_id": "1846592837461923022",
+        "text": "Two-tower models with approximate nearest neighbor indices remain the workhorse of e-commerce scale.",
+        "created_at": "2026-11-08T15:10:00Z",
+        "metrics": {
+          "likes": 198,
+          "retweets": 49,
+          "replies": 21
+        }
+      },
+      {
+        "tweet_id": "1845792837461923023",
+        "text": "Great session mentoring women in AI at the Singapore Tech Ladies hackathon.",
+        "created_at": "2026-11-07T09:00:00Z",
+        "metrics": {
+          "likes": 240,
+          "retweets": 45,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1844992837461923024",
+        "text": "Handling multilingual catalog searches across Thai, Vietnamese, and Bahasa requires customized tokenizer vocabularies.",
+        "created_at": "2026-11-06T07:25:00Z",
+        "metrics": {
+          "likes": 110,
+          "retweets": 29,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1844192837461923025",
+        "text": "Excited about how cross-attention mechanisms can improve cross-lingual image retrieval.",
+        "created_at": "2026-11-05T12:00:00Z",
+        "metrics": {
+          "likes": 85,
+          "retweets": 19,
+          "replies": 7
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "3398473810293852",
+    "username": "budi_robot",
+    "display_name": "Budi Santoso 🦾",
+    "bio": "Robotics Engineer @ PT Dirgantara Indonesia | Autonomous UAV guidance & telemetry systems | Bandung",
+    "location": "Bandung, Indonesia",
+    "follower_count": 2200,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=budi_robot",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847492837461923031",
+        "text": "Telemetry link testing over 40km range with customized directional antennas. Stable latency under 45ms.",
+        "created_at": "2026-11-10T08:50:00Z",
+        "metrics": {
+          "likes": 88,
+          "retweets": 20,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1846692837461923032",
+        "text": "Autonomous fail-safe return-to-base protocols are the most critical subsystem in industrial UAV operations.",
+        "created_at": "2026-11-09T04:15:00Z",
+        "metrics": {
+          "likes": 130,
+          "retweets": 31,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1845892837461923033",
+        "text": "Showcasing our indigenous composite drone airframes at the Bandung Aerospace Expo.",
+        "created_at": "2026-11-07T11:30:00Z",
+        "metrics": {
+          "likes": 215,
+          "retweets": 52,
+          "replies": 26
+        }
+      },
+      {
+        "tweet_id": "1845092837461923034",
+        "text": "Kalman filtering for IMU-GNSS sensor fusion during aggressive pitch maneuvers in turbulent wind.",
+        "created_at": "2026-11-06T10:00:00Z",
+        "metrics": {
+          "likes": 95,
+          "retweets": 22,
+          "replies": 11
+        }
+      },
+      {
+        "tweet_id": "1844292837461923035",
+        "text": "Indonesia's archipelago geography makes maritime and aerial robotics a strategic necessity.",
+        "created_at": "2026-11-05T06:10:00Z",
+        "metrics": {
+          "likes": 160,
+          "retweets": 41,
+          "replies": 18
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:robotics"
+  },
+  {
+    "x_user_id": "3498473810293853",
+    "username": "carlo_ml_dev",
+    "display_name": "Carlo Mendoza",
+    "bio": "Senior ML Engineer @ Maya Philippines | Fraud detection & credit scoring graph neural networks | Manila 🇵🇭",
+    "location": "Manila, Philippines",
+    "follower_count": 2700,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=carlo_ml_dev",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847592837461923041",
+        "text": "Graph neural networks for syndicate fraud detection cut our synthetic identity fraud by 45%.",
+        "created_at": "2026-11-10T15:20:00Z",
+        "metrics": {
+          "likes": 140,
+          "retweets": 36,
+          "replies": 15
+        }
+      },
+      {
+        "tweet_id": "1846792837461923042",
+        "text": "Sub-50 millisecond model inference at the payment gateway requires aggressive model distillation and C++ runtimes.",
+        "created_at": "2026-11-09T07:45:00Z",
+        "metrics": {
+          "likes": 175,
+          "retweets": 44,
+          "replies": 18
+        }
+      },
+      {
+        "tweet_id": "1845992837461923043",
+        "text": "Discussed AI governance in financial services at the FinTech Alliance Manila forum today.",
+        "created_at": "2026-11-07T12:10:00Z",
+        "metrics": {
+          "likes": 98,
+          "retweets": 21,
+          "replies": 8
+        }
+      },
+      {
+        "tweet_id": "1845192837461923044",
+        "text": "Handling concept drift in transaction streams during mega sale days (11.11 and 12.12).",
+        "created_at": "2026-11-06T05:30:00Z",
+        "metrics": {
+          "likes": 82,
+          "retweets": 18,
+          "replies": 10
+        }
+      },
+      {
+        "tweet_id": "1844392837461923045",
+        "text": "Always encouraging to see local Philippine fintech engineers contributing back to open-source ML libraries.",
+        "created_at": "2026-11-05T09:15:00Z",
+        "metrics": {
+          "likes": 115,
+          "retweets": 27,
+          "replies": 12
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "3598473810293854",
+    "username": "jessica_nlp_vn",
+    "display_name": "Jessica Ha 🇻🇳",
+    "bio": "NLP Researcher @ VinAI Research | Document understanding & multimodal LLMs | Hanoi, Vietnam",
+    "location": "Hanoi, Vietnam",
+    "follower_count": 4200,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=jessica_nlp_vn",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847692837461923051",
+        "text": "Our multimodal layout-aware model achieves state-of-the-art on complex financial table extraction benchmarks.",
+        "created_at": "2026-11-10T10:45:00Z",
+        "metrics": {
+          "likes": 180,
+          "retweets": 46,
+          "replies": 20
+        }
+      },
+      {
+        "tweet_id": "1846892837461923052",
+        "text": "Vietnamese diacritic restoration and OCR tokenization error propagation in LLMs: how we fixed it with byte-level encoders.",
+        "created_at": "2026-11-08T14:15:00Z",
+        "metrics": {
+          "likes": 220,
+          "retweets": 59,
+          "replies": 27
+        }
+      },
+      {
+        "tweet_id": "1846092837461923053",
+        "text": "Attending ACL conference in Vienna next year! Looking forward to meeting international NLP peers.",
+        "created_at": "2026-11-07T06:50:00Z",
+        "metrics": {
+          "likes": 135,
+          "retweets": 25,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1845292837461923054",
+        "text": "Fine-tuning 70B parameter models on internal cluster. Memory bandwidth matters more than raw TFLOPs.",
+        "created_at": "2026-11-06T13:20:00Z",
+        "metrics": {
+          "likes": 165,
+          "retweets": 42,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1844492837461923055",
+        "text": "The deep learning talent pool coming out of Hanoi and HCMC universities is truly impressive.",
+        "created_at": "2026-11-05T07:40:00Z",
+        "metrics": {
+          "likes": 245,
+          "retweets": 58,
+          "replies": 31
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "3698473810293855",
+    "username": "nina_crypto_ai",
+    "display_name": "Nina Blockchain 💎",
+    "bio": "Web3 x AI evangelist | NFT collections with AI art | Crypto trader | DeFi yield farmer | Singapore",
+    "location": "Singapore",
+    "follower_count": 12000,
+    "verified": true,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=nina_crypto_ai",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293847111",
+        "text": "AI + blockchain = the future. Our new NFT collection was generated by Midjourney. Mint now! 🚀",
+        "created_at": "2026-11-10T12:00:00Z",
+        "metrics": {
+          "likes": 567,
+          "retweets": 234,
+          "replies": 89
+        }
+      },
+      {
+        "tweet_id": "1846293847293847222",
+        "text": "Bull market incoming! AI tokens are going to 100x this cycle. What are you holding? 🔥",
+        "created_at": "2026-11-09T15:00:00Z",
+        "metrics": {
+          "likes": 890,
+          "retweets": 345,
+          "replies": 123
+        }
+      },
+      {
+        "tweet_id": "1845293847293847333",
+        "text": "Just tested this new decentralized compute coin. Yields look crazy high. NFA DYOR.",
+        "created_at": "2026-11-08T08:00:00Z",
+        "metrics": {
+          "likes": 345,
+          "retweets": 123,
+          "replies": 67
+        }
+      },
+      {
+        "tweet_id": "1844293847293847444",
+        "text": "DeFi protocols will all be managed by autonomous trading agents soon. Who agrees?",
+        "created_at": "2026-11-07T10:00:00Z",
+        "metrics": {
+          "likes": 456,
+          "retweets": 167,
+          "replies": 78
+        }
+      },
+      {
+        "tweet_id": "1843293847293847555",
+        "text": "GM to all the Web3 visionaries and crypto builders in Singapore! ☕",
+        "created_at": "2026-11-06T07:00:00Z",
+        "metrics": {
+          "likes": 678,
+          "retweets": 234,
+          "replies": 156
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:LLM infra"
+  },
+  {
+    "x_user_id": "3798473810293856",
+    "username": "david_techblog",
+    "display_name": "David Tech Reviews ✍️",
+    "bio": "Gadget reviewer & tech content creator | Unboxings, smartphone cameras, lifestyle tech | Bangkok",
+    "location": "Bangkok, Thailand",
+    "follower_count": 15000,
+    "verified": true,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=david_techblog",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293847666",
+        "text": "Top 10 AI camera features on the new flagship phones this year. Watch full review on my channel!",
+        "created_at": "2026-11-10T13:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 67,
+          "replies": 23
+        }
+      },
+      {
+        "tweet_id": "1846293847293847777",
+        "text": "Unboxing the latest smart robot vacuum. Does the LiDAR obstacle avoidance actually work with pet toys?",
+        "created_at": "2026-11-09T09:00:00Z",
+        "metrics": {
+          "likes": 345,
+          "retweets": 89,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1845293847293847888",
+        "text": "My desk setup tour 2026 is finally live! Check out the motorized standing desk and ambient lighting.",
+        "created_at": "2026-11-08T11:00:00Z",
+        "metrics": {
+          "likes": 567,
+          "retweets": 145,
+          "replies": 67
+        }
+      },
+      {
+        "tweet_id": "1844293847293847999",
+        "text": "Which smartphone colorway do you prefer: Cosmic Black or Titanium Silver?",
+        "created_at": "2026-11-07T08:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 56,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1843293847293848000",
+        "text": "Coffee + editing video reviews all Sunday morning. Grind never stops.",
+        "created_at": "2026-11-06T14:00:00Z",
+        "metrics": {
+          "likes": 456,
+          "retweets": 123,
+          "replies": 56
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "3898473810293857",
+    "username": "ahmad_data",
+    "display_name": "Ahmad DataViz 📊",
+    "bio": "Senior Data Analyst @ Tokopedia | Tableau, Power BI, Excel formulas | Data storytelling | Jakarta",
+    "location": "Jakarta, Indonesia",
+    "follower_count": 3200,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahmad_data",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293848111",
+        "text": "5 dashboard color palette rules to make your executive stakeholders happy. Thread 🧵",
+        "created_at": "2026-11-10T04:00:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 11
+        }
+      },
+      {
+        "tweet_id": "1846293847293848222",
+        "text": "XLOOKUP vs VLOOKUP: why you should never use VLOOKUP in modern spreadsheets.",
+        "created_at": "2026-11-09T06:00:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 45,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1845293847293848333",
+        "text": "AI features in BI tools are handy for draft queries, but you still have to verify the underlying schema joins.",
+        "created_at": "2026-11-08T10:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 67,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1844293847293848444",
+        "text": "Created a sales funnel KPI tracker for our commercial team. Clean visual hierarchy is everything.",
+        "created_at": "2026-11-07T07:00:00Z",
+        "metrics": {
+          "likes": 67,
+          "retweets": 18,
+          "replies": 8
+        }
+      },
+      {
+        "tweet_id": "1843293847293848555",
+        "text": "Sunday coffee and practicing SQL window functions. Keep skills sharp!",
+        "created_at": "2026-11-06T05:00:00Z",
+        "metrics": {
+          "likes": 345,
+          "retweets": 89,
+          "replies": 45
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "3998473810293858",
+    "username": "maya_marketing",
+    "display_name": "Maya | Growth Marketing 🚀",
+    "bio": "Head of Growth @ SaaS agency | Paid ads, Meta ads, TikTok marketing, funnel conversion | KL",
+    "location": "Kuala Lumpur, Malaysia",
+    "follower_count": 7800,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maya_marketing",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847293847293848666",
+        "text": "Using AI to generate 50 ad creative variations in 10 minutes. CTR went up 18% on our latest campaign.",
+        "created_at": "2026-11-10T09:00:00Z",
+        "metrics": {
+          "likes": 123,
+          "retweets": 34,
+          "replies": 15
+        }
+      },
+      {
+        "tweet_id": "1846293847293848777",
+        "text": "CAC on Meta ads has stabilized in SEA this quarter. Focus on short-form video hooks.",
+        "created_at": "2026-11-09T11:00:00Z",
+        "metrics": {
+          "likes": 234,
+          "retweets": 67,
+          "replies": 28
+        }
+      },
+      {
+        "tweet_id": "1845293847293848888",
+        "text": "Email open rates are declining across the board. SMS and WhatsApp automation are taking over in Malaysia.",
+        "created_at": "2026-11-08T07:00:00Z",
+        "metrics": {
+          "likes": 345,
+          "retweets": 89,
+          "replies": 34
+        }
+      },
+      {
+        "tweet_id": "1844293847293848999",
+        "text": "Hiring a junior performance marketer in Kuala Lumpur! Send portfolios via DM.",
+        "created_at": "2026-11-07T05:00:00Z",
+        "metrics": {
+          "likes": 89,
+          "retweets": 23,
+          "replies": 12
+        }
+      },
+      {
+        "tweet_id": "1843293847293849000",
+        "text": "Organic social content is great, but disciplined paid acquisition is what scales venture businesses.",
+        "created_at": "2026-11-06T08:00:00Z",
+        "metrics": {
+          "likes": 456,
+          "retweets": 123,
+          "replies": 56
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4098473810293859",
+    "username": "kevin_frontender",
+    "display_name": "Kevin Tan 💻",
+    "bio": "Junior Frontend Dev | Learning React, Tailwind CSS, Next.js | Building landing pages | Singapore",
+    "location": "Singapore",
+    "follower_count": 850,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=kevin_frontender",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847192837461923061",
+        "text": "Finally understood flexbox align-items vs justify-content! CSS is feeling less scary now.",
+        "created_at": "2026-11-10T14:10:00Z",
+        "metrics": {
+          "likes": 42,
+          "retweets": 8,
+          "replies": 7
+        }
+      },
+      {
+        "tweet_id": "1846392837461923062",
+        "text": "Created a personal portfolio site using shadcn/ui components. Loved the copy-paste architecture.",
+        "created_at": "2026-11-08T10:30:00Z",
+        "metrics": {
+          "likes": 65,
+          "retweets": 12,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1845592837461923063",
+        "text": "ChatGPT helped me debug an async useEffect hook bug in 30 seconds. Coding in 2026 is wild.",
+        "created_at": "2026-11-07T07:15:00Z",
+        "metrics": {
+          "likes": 98,
+          "retweets": 17,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1844792837461923064",
+        "text": "Looking for entry-level junior frontend roles in Singapore or remote SEA companies.",
+        "created_at": "2026-11-06T03:50:00Z",
+        "metrics": {
+          "likes": 110,
+          "retweets": 25,
+          "replies": 18
+        }
+      },
+      {
+        "tweet_id": "1843992837461923065",
+        "text": "Day 45 of 100DaysOfCode. Finished a responsive navbar with mobile hamburger menu.",
+        "created_at": "2026-11-05T15:20:00Z",
+        "metrics": {
+          "likes": 52,
+          "retweets": 9,
+          "replies": 6
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4198473810293860",
+    "username": "steph_coach",
+    "display_name": "Stephanie | Career Coach 🎯",
+    "bio": "Executive Coach for Tech Leaders | Helping managers transition to VP | Speaker & Author | Singapore",
+    "location": "Singapore",
+    "follower_count": 9200,
+    "verified": true,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=steph_coach",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847292837461923071",
+        "text": "The #1 mistake first-time engineering managers make: trying to keep coding all day instead of delegating.",
+        "created_at": "2026-11-10T02:30:00Z",
+        "metrics": {
+          "likes": 310,
+          "retweets": 78,
+          "replies": 42
+        }
+      },
+      {
+        "tweet_id": "1846492837461923072",
+        "text": "How AI tools can help leaders draft 1-on-1 meeting agendas and performance reviews faster.",
+        "created_at": "2026-11-09T08:45:00Z",
+        "metrics": {
+          "likes": 140,
+          "retweets": 29,
+          "replies": 16
+        }
+      },
+      {
+        "tweet_id": "1845692837461923073",
+        "text": "Imposter syndrome doesn't disappear when you reach Director or VP level. You just learn to manage it.",
+        "created_at": "2026-11-07T12:00:00Z",
+        "metrics": {
+          "likes": 450,
+          "retweets": 112,
+          "replies": 55
+        }
+      },
+      {
+        "tweet_id": "1844892837461923074",
+        "text": "Hosting an executive leadership roundtable in Singapore next month. Space limited to 15 leaders.",
+        "created_at": "2026-11-06T06:15:00Z",
+        "metrics": {
+          "likes": 85,
+          "retweets": 14,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1844092837461923075",
+        "text": "Active listening is the highest leverage skill you can develop in business.",
+        "created_at": "2026-11-05T10:30:00Z",
+        "metrics": {
+          "likes": 215,
+          "retweets": 48,
+          "replies": 23
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4298473810293861",
+    "username": "arun_recruiter",
+    "display_name": "Arun Nair 🤝",
+    "bio": "Headhunter & Talent Partner | Placing C-suite & Staff Engineers across SEA tech startups | KL",
+    "location": "Kuala Lumpur, Malaysia",
+    "follower_count": 6700,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=arun_recruiter",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847392837461923081",
+        "text": "Demand for AI/ML engineers in Southeast Asia is up 120% year-on-year. Compensation bands are stretching.",
+        "created_at": "2026-11-10T07:15:00Z",
+        "metrics": {
+          "likes": 185,
+          "retweets": 45,
+          "replies": 29
+        }
+      },
+      {
+        "tweet_id": "1846592837461923082",
+        "text": "Candidate tip: having GitHub repos with real deployed projects will beat 5 certificates every time.",
+        "created_at": "2026-11-08T11:20:00Z",
+        "metrics": {
+          "likes": 320,
+          "retweets": 85,
+          "replies": 38
+        }
+      },
+      {
+        "tweet_id": "1845792837461923083",
+        "text": "Currently looking for a VP of Engineering for a Series A robotics startup in Singapore. DM me confidential leads.",
+        "created_at": "2026-11-07T04:40:00Z",
+        "metrics": {
+          "likes": 95,
+          "retweets": 24,
+          "replies": 15
+        }
+      },
+      {
+        "tweet_id": "1844992837461923084",
+        "text": "Remote compensation disparities between US and SEA talent are slowly narrowing for elite talent.",
+        "created_at": "2026-11-06T13:00:00Z",
+        "metrics": {
+          "likes": 210,
+          "retweets": 51,
+          "replies": 27
+        }
+      },
+      {
+        "tweet_id": "1844192837461923085",
+        "text": "Always happy to connect with founders planning their Q1 hiring roadmap.",
+        "created_at": "2026-11-05T08:50:00Z",
+        "metrics": {
+          "likes": 65,
+          "retweets": 12,
+          "replies": 6
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4398473810293862",
+    "username": "hannah_design",
+    "display_name": "Hannah Tan 🎨",
+    "bio": "Senior Product Designer @ Grab | Mobile design systems, micro-interactions, accessibility | Singapore",
+    "location": "Singapore",
+    "follower_count": 4100,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=hannah_design",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847492837461923091",
+        "text": "Designing bottom sheet interactions that feel native on both iOS and Android is harder than it looks.",
+        "created_at": "2026-11-10T12:30:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 32,
+          "replies": 14
+        }
+      },
+      {
+        "tweet_id": "1846692837461923092",
+        "text": "Using AI to generate placeholder UI copy and user personas during early wireframing stages.",
+        "created_at": "2026-11-09T05:15:00Z",
+        "metrics": {
+          "likes": 110,
+          "retweets": 22,
+          "replies": 9
+        }
+      },
+      {
+        "tweet_id": "1845892837461923093",
+        "text": "Figma variables have completely overhauled how we manage multi-brand design tokens across Grab apps.",
+        "created_at": "2026-11-07T09:40:00Z",
+        "metrics": {
+          "likes": 230,
+          "retweets": 58,
+          "replies": 22
+        }
+      },
+      {
+        "tweet_id": "1845092837461923094",
+        "text": "Always design for slow 3G networks and smaller screen devices when designing for regional SEA markets.",
+        "created_at": "2026-11-06T08:00:00Z",
+        "metrics": {
+          "likes": 275,
+          "retweets": 67,
+          "replies": 29
+        }
+      },
+      {
+        "tweet_id": "1844292837461923095",
+        "text": "Coffee and wireframing on Sunday afternoon. Enjoying quiet creative time.",
+        "created_at": "2026-11-05T06:20:00Z",
+        "metrics": {
+          "likes": 88,
+          "retweets": 11,
+          "replies": 5
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4498473810293863",
+    "username": "tommy_crypto_ph",
+    "display_name": "Tommy Axie 🎮",
+    "bio": "Web3 gamer | Play-to-earn advocate | Guild manager | NFT trader | Manila, Philippines",
+    "location": "Manila, Philippines",
+    "follower_count": 5300,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=tommy_crypto_ph",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847592837461923101",
+        "text": "New AI-powered gaming metaverse launching this Friday! Who else has whitelisted their wallet?",
+        "created_at": "2026-11-10T16:00:00Z",
+        "metrics": {
+          "likes": 180,
+          "retweets": 65,
+          "replies": 35
+        }
+      },
+      {
+        "tweet_id": "1846792837461923102",
+        "text": "Web3 gaming in the Philippines will make a comeback as gameplay quality improves beyond simple grinding.",
+        "created_at": "2026-11-09T10:20:00Z",
+        "metrics": {
+          "likes": 240,
+          "retweets": 72,
+          "replies": 44
+        }
+      },
+      {
+        "tweet_id": "1845992837461923103",
+        "text": "Streaming new Web3 RPG tonight at 8 PM Manila time. Giveaways for chat members! 🎁",
+        "created_at": "2026-11-07T13:15:00Z",
+        "metrics": {
+          "likes": 95,
+          "retweets": 28,
+          "replies": 19
+        }
+      },
+      {
+        "tweet_id": "1845192837461923104",
+        "text": "AI NPC companions in games will make single-player campaigns feel like real multiplayer adventures.",
+        "created_at": "2026-11-06T04:40:00Z",
+        "metrics": {
+          "likes": 135,
+          "retweets": 36,
+          "replies": 18
+        }
+      },
+      {
+        "tweet_id": "1844392837461923105",
+        "text": "Good morning builders and gamers! Never stop grinding. ☕",
+        "created_at": "2026-11-05T01:30:00Z",
+        "metrics": {
+          "likes": 160,
+          "retweets": 33,
+          "replies": 21
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  },
+  {
+    "x_user_id": "4598473810293864",
+    "username": "faye_lifestyle",
+    "display_name": "Faye | Content & Life ✨",
+    "bio": "Lifestyle vlogger & digital marketer | Travel in SEA | Coffee enthusiast | Ho Chi Minh City",
+    "location": "Ho Chi Minh City, Vietnam",
+    "follower_count": 8900,
+    "verified": false,
+    "profile_image_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=faye_lifestyle",
+    "recent_tweets": [
+      {
+        "tweet_id": "1847692837461923111",
+        "text": "Best cafes in District 3 for working remotely with strong wifi and great egg coffee ☕🇻🇳",
+        "created_at": "2026-11-10T09:30:00Z",
+        "metrics": {
+          "likes": 310,
+          "retweets": 54,
+          "replies": 28
+        }
+      },
+      {
+        "tweet_id": "1846892837461923112",
+        "text": "Using AI caption generators to brainstorm TikTok video titles. Saves so much time!",
+        "created_at": "2026-11-08T13:45:00Z",
+        "metrics": {
+          "likes": 145,
+          "retweets": 22,
+          "replies": 15
+        }
+      },
+      {
+        "tweet_id": "1846092837461923113",
+        "text": "Quick weekend getaway to Da Lat. The cool weather is always the best recharge.",
+        "created_at": "2026-11-07T06:00:00Z",
+        "metrics": {
+          "likes": 420,
+          "retweets": 48,
+          "replies": 31
+        }
+      },
+      {
+        "tweet_id": "1845292837461923114",
+        "text": "New vlog episode: 24 hours eating street food in Saigon. Link in bio!",
+        "created_at": "2026-11-06T11:10:00Z",
+        "metrics": {
+          "likes": 260,
+          "retweets": 35,
+          "replies": 22
+        }
+      },
+      {
+        "tweet_id": "1844492837461923115",
+        "text": "Grateful for this community. Wishing everyone a productive week ahead!",
+        "created_at": "2026-11-05T02:15:00Z",
+        "metrics": {
+          "likes": 180,
+          "retweets": 19,
+          "replies": 12
+        }
+      }
+    ],
+    "pinned_tweet": null,
+    "discovery_source": "search:developer tools"
+  }
+]
