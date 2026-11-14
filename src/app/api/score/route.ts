@@ -8,7 +8,12 @@ import { AnthropicProvider } from "@/lib/providers/llm/anthropic";
 import type { ILLMProvider, SegmentContext } from "@/lib/providers/llm/types";
 import type { UserProfile } from "@/lib/providers/x/types";
 
+import { HeuristicSandboxProvider } from "@/lib/providers/llm/heuristic-sandbox";
+
 function createLLMProvider(provider: string, apiKey: string): ILLMProvider {
+  if (!apiKey) {
+    return new HeuristicSandboxProvider();
+  }
   switch (provider) {
     case "openai":
       return new OpenAIProvider(apiKey);
@@ -44,13 +49,7 @@ export async function POST(req: NextRequest) {
     process.env.OPENAI_API_KEY ||
     "";
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: `No API key configured for ${llmProvider}. Go to Settings.` },
-      { status: 400 }
-    );
-  }
-
+  // Use configured live provider or fallback to zero-config Sandbox engine
   const llm = createLLMProvider(llmProvider, apiKey);
 
   const results: { id: string; fit_score: number; status: string; error?: string }[] = [];

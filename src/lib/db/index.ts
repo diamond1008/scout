@@ -2,8 +2,12 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
+const dbUrl = process.env.TURSO_DATABASE_URL || "file:scout.db";
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
 const client = createClient({
-  url: "file:scout.db",
+  url: dbUrl,
+  authToken: authToken,
 });
 
 // Initialize tables if they don't exist

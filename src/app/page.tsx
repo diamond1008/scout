@@ -52,10 +52,12 @@ export default function HomePage() {
   const [newDesc, setNewDesc] = useState("");
   const [newKeywords, setNewKeywords] = useState("");
   const [newSeeds, setNewSeeds] = useState("");
+  const [newMode, setNewMode] = useState<"sandbox" | "live">("sandbox");
   const [showCreate, setShowCreate] = useState(false);
 
-  // Settings
+  // Settings & Health
   const [settingsValues, setSettingsValues] = useState<Record<string, string>>({});
+  const [healthData, setHealthData] = useState<any>(null);
 
   // Review state
   const [reviewIndex, setReviewIndex] = useState(0);
@@ -97,14 +99,48 @@ export default function HomePage() {
         description: newDesc,
         keywords: newKeywords.split(",").map((k) => k.trim()).filter(Boolean),
         seedHandles: newSeeds.split(",").map((s) => s.trim()).filter(Boolean),
-        mode: "sandbox",
+        mode: newMode,
       }),
     });
-    setNewName(""); setNewDesc(""); setNewKeywords(""); setNewSeeds("");
+    setNewName(""); setNewDesc(""); setNewKeywords(""); setNewSeeds(""); setNewMode("sandbox");
     setShowCreate(false);
     await fetchCampaigns();
     setLoading(false);
     showMsg("Campaign created ✓");
+  };
+
+  const toggleCampaignMode = async (c: Campaign, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const targetMode = c.mode === "sandbox" ? "live" : "sandbox";
+    try {
+      await fetch(`/api/campaigns?id=${c.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: targetMode }),
+      });
+      await fetchCampaigns();
+      if (selectedCampaign?.id === c.id) {
+        setSelectedCampaign({ ...selectedCampaign, mode: targetMode });
+      }
+      showMsg(`Campaign switched to ${targetMode.toUpperCase()} mode ✓`);
+    } catch {
+      showMsg("Failed to switch campaign mode");
+    }
+  };
+
+  const testConnection = async () => {
+    setLoading(true);
+    showMsg("Checking API health...");
+    try {
+      const res = await fetch("/api/health");
+      const data = await res.json();
+      setHealthData(data);
+      showMsg(data.connected ? "Connection healthy ✓" : `Status: ${data.error || "Sandbox Active"}`);
+    } catch {
+      showMsg("Failed to check health");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const runDiscovery = async () => {
@@ -340,6 +376,43 @@ export default function HomePage() {
                   <label className="text-sm font-medium">Seed Handles (comma-separated, optional)</label>
                   <Input value={newSeeds} onChange={(e) => setNewSeeds(e.target.value)} placeholder="@jane_robotics, @robo_builder" />
                 </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1.5">Execution Mode</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${newMode === "sandbox" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:bg-muted/30"}`}>
+                      <input
+                        type="radio"
+                        name="campaign_mode"
+                        value="sandbox"
+                        checked={newMode === "sandbox"}
+                        onChange={() => setNewMode("sandbox")}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-semibold text-sm">🟢 Safe Sandbox ($0 Cost)</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          Zero X API spend. Test end-to-end with 30 curated SEA AI & robotics profiles, evidence extraction, and simulated replies.
+                        </div>
+                      </div>
+                    </label>
+                    <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${newMode === "live" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:bg-muted/30"}`}>
+                      <input
+                        type="radio"
+                        name="campaign_mode"
+                        value="live"
+                        checked={newMode === "live"}
+                        onChange={() => setNewMode("live")}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-semibold text-sm">🔴 Live X API v2 (BYOK)</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          Real X API endpoints with token bucket rate limiting (15 DMs/15 min). Requires valid X Bearer & User tokens in Settings.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
               </CardContent>
               <CardFooter>
                 <Button onClick={createCampaign} disabled={!newName || loading}>Create</Button>
@@ -360,10 +433,17 @@ export default function HomePage() {
                       <CardTitle>{c.name}</CardTitle>
                       <CardDescription className="mt-1">{c.description}</CardDescription>
                     </div>
-                    <div className="flex gap-2">
-                      <Badge variant={c.mode === "sandbox" ? "success" : "destructive"}>
-                        {c.mode === "sandbox" ? "🟢 Sandbox" : "🔴 Live"}
-                      </Badge>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => toggleCampaignMode(c, e)}
+                        title="Click to toggle between Sandbox and Live mode"
+                        className="cursor-pointer transition-transform hover:scale-105 active:scale-95 focus:outline-none"
+                      >
+                        <Badge variant={c.mode === "sandbox" ? "success" : "destructive"}>
+                          {c.mode === "sandbox" ? "🟢 Sandbox (Click to switch)" : "🔴 Live (Click to switch)"}
+                        </Badge>
+                      </button>
                       <Badge variant="outline">{c.status}</Badge>
                     </div>
                   </div>
@@ -689,7 +769,7 @@ export default function HomePage() {
           </div>
 
           {/* Stats */}
-          <div className="flex gap-6 mb-6 text-sm">
+          <div className="flex gap-6 mb-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-emerald-500" />
               Sent: <strong>{stats.sent}</strong>
@@ -709,6 +789,27 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-yellow-400" />
               Pending: <strong>{stats.approved}</strong>
+            </div>
+          </div>
+
+          {/* Compliance & Platform Safety Callout */}
+          <div className="mb-6 p-4 rounded-lg border bg-muted/40 text-xs text-muted-foreground space-y-2">
+            <div className="flex items-center gap-2 font-semibold text-foreground text-sm">
+              <span>🛡️ Platform Compliance & Anti-Duplicate Guarantees</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <div className="p-2.5 rounded bg-background border">
+                <strong className="text-foreground block mb-1">Zero Double-Messaging Invariant</strong>
+                Database-level <code className="text-xs bg-muted px-1 py-0.5 rounded">UNIQUE(x_user_id)</code> constraint + atomic state transitions guarantee no profile ever receives duplicate messages.
+              </div>
+              <div className="p-2.5 rounded bg-background border">
+                <strong className="text-foreground block mb-1">Strict X API Rate Limits</strong>
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">TokenBucketRateLimiter</code> enforces 15 DMs per 15-minute window with auto-exponential backoff on HTTP 429.
+              </div>
+              <div className="p-2.5 rounded bg-background border">
+                <strong className="text-foreground block mb-1">Closed DMs Handling</strong>
+                Profiles with direct messages closed (HTTP 403) are safely marked as <code className="text-xs bg-muted px-1 py-0.5 rounded">BLOCKED_DM_CLOSED</code> without consuming retries.
+              </div>
             </div>
           </div>
 
@@ -862,6 +963,61 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-base">System Diagnostics & API Health</CardTitle>
+              <CardDescription>Verify your API connectivity, rate limits, and provider status</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button
+                variant="outline"
+                onClick={testConnection}
+                disabled={loading}
+              >
+                🔍 Run Diagnostics & Test Connection
+              </Button>
+
+              {healthData && (
+                <div className="mt-3 p-3 rounded-lg border bg-muted/30 text-xs space-y-2">
+                  <div className="flex justify-between items-center border-b pb-2">
+                    <span className="font-semibold">Provider Mode:</span>
+                    <Badge variant={healthData.mode === "sandbox" ? "success" : "destructive"}>
+                      {healthData.mode?.toUpperCase() || "SANDBOX"}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Connected:</span>
+                    <span className={healthData.connected ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"}>
+                      {healthData.connected ? "Yes (Authenticated)" : "No (Using Safe Sandbox)"}
+                    </span>
+                  </div>
+                  {healthData.username && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">X Handle:</span>
+                      <span className="font-mono font-medium">@{healthData.username}</span>
+                    </div>
+                  )}
+                  {healthData.rate_limit_remaining !== undefined && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">DM Rate Limit Remaining:</span>
+                      <span className="font-mono">{healthData.rate_limit_remaining} / 15</span>
+                    </div>
+                  )}
+                  {healthData.note && (
+                    <div className="p-2 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 mt-2">
+                      💡 {healthData.note}
+                    </div>
+                  )}
+                  {healthData.error && (
+                    <div className="p-2 rounded bg-amber-50 text-amber-900 border border-amber-200 mt-2">
+                      ⚠️ {healthData.error}
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

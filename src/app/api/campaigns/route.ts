@@ -29,6 +29,25 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(newCampaign, { status: 201 });
 }
 
+export async function PATCH(req: NextRequest) {
+  const db = getDb();
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  const body = await req.json();
+  const updates: Record<string, any> = { updatedAt: new Date().toISOString() };
+  if (body.mode) updates.mode = body.mode;
+  if (body.status) updates.status = body.status;
+  if (body.name) updates.name = body.name;
+
+  await db.update(campaigns).set(updates).where(eq(campaigns.id, id)).run();
+  const updated = await db.select().from(campaigns).where(eq(campaigns.id, id)).get();
+  return NextResponse.json(updated);
+}
+
 export async function DELETE(req: NextRequest) {
   const db = getDb();
   const { searchParams } = new URL(req.url);
