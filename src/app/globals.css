@@ -1,35 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
-  --color-card: #ffffff;
-  --color-card-foreground: #0a0a0a;
-  --color-popover: #ffffff;
-  --color-popover-foreground: #0a0a0a;
-  --color-primary: #171717;
-  --color-primary-foreground: #fafafa;
-  --color-secondary: #f5f5f5;
-  --color-secondary-foreground: #171717;
-  --color-muted: #f5f5f5;
-  --color-muted-foreground: #737373;
-  --color-accent: #f5f5f5;
-  --color-accent-foreground: #171717;
+  --color-background: #090a0f;
+  --color-foreground: #f1f3f7;
+  --color-card: #0f121c;
+  --color-card-foreground: #f1f3f7;
+  --color-popover: #0f121c;
+  --color-popover-foreground: #f1f3f7;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #171b29;
+  --color-secondary-foreground: #cbd5e1;
+  --color-muted: #141824;
+  --color-muted-foreground: #8b95a5;
+  --color-accent: #1b2133;
+  --color-accent-foreground: #ffffff;
   --color-destructive: #ef4444;
-  --color-destructive-foreground: #fafafa;
-  --color-border: #e5e5e5;
-  --color-input: #e5e5e5;
-  --color-ring: #0a0a0a;
-  --radius: 0.5rem;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #1b2133;
+  --color-input: #1b2133;
+  --color-ring: #3b82f6;
+  --radius: 0.625rem;
 
-  --color-sidebar-background: #fafafa;
-  --color-sidebar-foreground: #0a0a0a;
-  --color-sidebar-primary: #171717;
-  --color-sidebar-primary-foreground: #fafafa;
-  --color-sidebar-accent: #f5f5f5;
-  --color-sidebar-accent-foreground: #171717;
-  --color-sidebar-border: #e5e5e5;
-  --color-sidebar-ring: #0a0a0a;
+  --color-sidebar-background: #0b0d14;
+  --color-sidebar-foreground: #f1f3f7;
+  --color-sidebar-primary: #3b82f6;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #171b29;
+  --color-sidebar-accent-foreground: #ffffff;
+  --color-sidebar-border: #1b2133;
+  --color-sidebar-ring: #3b82f6;
 }
 
 @layer base {
@@ -37,6 +37,22 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-blue-600/30 selection:text-blue-200;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  /* Custom scrollbar for dense data panels */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1b2133;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #283147;
   }
 }

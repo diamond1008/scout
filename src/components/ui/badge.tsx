@@ -9,18 +9,18 @@ function Badge({
   variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning";
 }) {
   const variantClasses = {
-    default: "bg-primary text-primary-foreground",
-    secondary: "bg-secondary text-secondary-foreground",
-    destructive: "bg-destructive text-destructive-foreground",
-    outline: "border border-input bg-background text-foreground",
-    success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-    warning: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+    default: "bg-primary text-primary-foreground shadow-sm",
+    secondary: "bg-secondary text-secondary-foreground border border-border/80",
+    destructive: "bg-rose-500/10 text-rose-400 border border-rose-500/25",
+    outline: "border border-border/90 bg-card/50 text-foreground/90 backdrop-blur-sm",
+    success: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25",
+    warning: "bg-amber-500/10 text-amber-400 border border-amber-500/25",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium tracking-wide transition-colors",
         variantClasses[variant],
         className
       )}
