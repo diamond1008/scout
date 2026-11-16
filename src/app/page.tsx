@@ -22,23 +22,18 @@ import {
   MessageSquare,
   RefreshCw,
   Terminal,
-  XCircle,
   Clock,
   Lock,
   Cpu,
   Radio,
   Zap,
   Eye,
-  AtSign,
   Globe,
-  SlidersHorizontal,
   ChevronRight,
   TrendingUp,
   UserCheck,
   Layers,
-  HelpCircle,
-  Copy,
-  ChevronDown
+  ArrowRight
 } from "lucide-react";
 
 interface Campaign {
@@ -155,7 +150,6 @@ export default function HomePage() {
     if (!current) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in textarea or input
       if (["TEXTAREA", "INPUT"].includes((e.target as HTMLElement).tagName)) {
         return;
       }
@@ -181,7 +175,7 @@ export default function HomePage() {
   // ── Campaign actions ────────────────────────────────────
   const createCampaign = async () => {
     setLoading(true);
-    setLoadingText("Creating campaign radar...");
+    setLoadingText("Creating radar...");
     try {
       const res = await fetch("/api/campaigns", {
         method: "POST",
@@ -233,7 +227,7 @@ export default function HomePage() {
       const res = await fetch("/api/health");
       const data = await res.json();
       setHealthData(data);
-      showMsg(data.connected ? "Connection healthy & verified ✓" : `Status: ${data.error || "Sandbox Active"}`);
+      showMsg(data.connected ? "Connection verified ✓" : `Status: ${data.error || "Sandbox Active"}`);
     } catch {
       showMsg("Failed to check health");
     } finally {
@@ -360,7 +354,7 @@ export default function HomePage() {
   const syncReplies = async () => {
     if (!selectedCampaign) return;
     setLoading(true);
-    setLoadingText("Checking X conversations & syncing inbound replies...");
+    setLoadingText("Syncing inbound X replies...");
     try {
       const res = await fetch("/api/replies", {
         method: "POST",
@@ -460,20 +454,20 @@ export default function HomePage() {
     if (score === null || score === undefined) return <Badge variant="outline">Unrated</Badge>;
     if (score >= 0.75) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-          <Sparkles className="w-3 h-3" /> {(score * 100).toFixed(0)}% High Fit
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/90 shadow-2xs">
+          <Sparkles className="w-3 h-3 text-emerald-600" /> {(score * 100).toFixed(0)}% High Fit
         </span>
       );
     }
     if (score >= 0.4) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/90 shadow-2xs">
           {(score * 100).toFixed(0)}% Relevant
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-normal bg-zinc-800 text-zinc-400 border border-zinc-700">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-normal bg-slate-100 text-slate-600 border border-slate-200 shadow-2xs">
         {(score * 100).toFixed(0)}% Low Match
       </span>
     );
@@ -481,22 +475,22 @@ export default function HomePage() {
 
   const getStatusBadge = (status: string) => {
     const map: Record<string, { label: string; className: string; icon?: React.ReactNode }> = {
-      DISCOVERED: { label: "Discovered", className: "bg-zinc-800 text-zinc-300 border-zinc-700" },
-      SCORED: { label: "Scored", className: "bg-blue-500/10 text-blue-300 border-blue-500/25" },
-      DRAFTED: { label: "Draft Ready", className: "bg-amber-500/15 text-amber-300 border-amber-500/30", icon: <Clock className="w-3 h-3" /> },
-      APPROVED: { label: "Approved", className: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: <CheckCircle2 className="w-3 h-3" /> },
-      REJECTED: { label: "Rejected", className: "bg-zinc-800 text-zinc-500 border-zinc-700" },
-      SENDING: { label: "Sending...", className: "bg-amber-500/20 text-amber-200 border-amber-500/40 animate-pulse" },
-      SENT: { label: "Delivered", className: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: <Check className="w-3 h-3" /> },
-      SENT_SANDBOX: { label: "Sent (Sandbox)", className: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: <Check className="w-3 h-3" /> },
-      REPLIED: { label: "Replied 🔔", className: "bg-indigo-500/20 text-indigo-300 border-indigo-500/40 font-semibold", icon: <MessageSquare className="w-3 h-3" /> },
-      BLOCKED_DM_CLOSED: { label: "DMs Closed", className: "bg-rose-500/15 text-rose-300 border-rose-500/30", icon: <Lock className="w-3 h-3" /> },
-      FAILED_RETRYABLE: { label: "Retryable", className: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-      FAILED_PERMANENT: { label: "Failed", className: "bg-rose-500/15 text-rose-400 border-rose-500/30" },
+      DISCOVERED: { label: "Discovered", className: "bg-slate-100 text-slate-700 border-slate-200/80" },
+      SCORED: { label: "Scored", className: "bg-blue-50 text-blue-700 border-blue-200/80" },
+      DRAFTED: { label: "Draft Ready", className: "bg-amber-50 text-amber-700 border-amber-200/90", icon: <Clock className="w-3 h-3 text-amber-600" /> },
+      APPROVED: { label: "Approved", className: "bg-emerald-50 text-emerald-700 border-emerald-200/90", icon: <CheckCircle2 className="w-3 h-3 text-emerald-600" /> },
+      REJECTED: { label: "Rejected", className: "bg-slate-100 text-slate-500 border-slate-200" },
+      SENDING: { label: "Sending...", className: "bg-amber-100 text-amber-800 border-amber-300 animate-pulse" },
+      SENT: { label: "Delivered", className: "bg-emerald-50 text-emerald-700 border-emerald-200/90", icon: <Check className="w-3 h-3 text-emerald-600" /> },
+      SENT_SANDBOX: { label: "Sent (Sandbox)", className: "bg-emerald-50 text-emerald-700 border-emerald-200/90", icon: <Check className="w-3 h-3 text-emerald-600" /> },
+      REPLIED: { label: "Replied 🔔", className: "bg-indigo-50 text-indigo-700 border-indigo-200 font-semibold shadow-2xs", icon: <MessageSquare className="w-3 h-3 text-indigo-600" /> },
+      BLOCKED_DM_CLOSED: { label: "DMs Closed", className: "bg-rose-50 text-rose-700 border-rose-200", icon: <Lock className="w-3 h-3 text-rose-600" /> },
+      FAILED_RETRYABLE: { label: "Retryable", className: "bg-amber-50 text-amber-700 border-amber-200" },
+      FAILED_PERMANENT: { label: "Failed", className: "bg-rose-50 text-rose-700 border-rose-200" },
     };
-    const s = map[status] || { label: status, className: "bg-zinc-800 text-zinc-400" };
+    const s = map[status] || { label: status, className: "bg-slate-100 text-slate-600 border-slate-200" };
     return (
-      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] border font-medium ${s.className}`}>
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] border font-medium backdrop-blur-md ${s.className}`}>
         {s.icon}
         {s.label}
       </span>
@@ -504,61 +498,55 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="min-h-screen text-slate-900 flex flex-col font-sans" suppressHydrationWarning>
       {/* ── Toast Notification ────────────────────────────── */}
       {message && (
-        <div className="fixed top-4 right-6 z-50 bg-card border border-border shadow-2xl rounded-xl px-4 py-3 text-sm flex items-center gap-2.5 animate-in slide-in-from-top-4 backdrop-blur-md">
-          <div className="h-2 w-2 rounded-full bg-blue-500 animate-ping" />
-          <span className="font-medium text-foreground">{message}</span>
+        <div className="fixed top-5 right-6 z-50 bg-white/90 border border-white/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] rounded-2xl px-4 py-3 text-sm flex items-center gap-2.5 animate-in slide-in-from-top-4 backdrop-blur-2xl ring-1 ring-black/[0.04]">
+          <div className="h-2 w-2 rounded-full bg-[#0071e3] animate-ping" />
+          <span className="font-medium text-slate-800">{message}</span>
         </div>
       )}
 
-      {/* ── Top Executive Navigation Header ───────────────── */}
-      <header className="border-b border-border/80 bg-card/60 backdrop-blur-xl sticky top-0 z-40">
+      {/* ── Apple Liquid Glass Top Navigation ────────────── */}
+      <header className="border-b border-white/60 bg-white/70 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
-          {/* Brand Identity */}
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/10">
-              <Compass className="h-5 w-5 text-white" />
-            </div>
-            <div>
+          {/* Brand Identity - No background on icon */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Compass className="h-7 w-7 text-[#0071e3] shrink-0 stroke-[2.2]" />
+            <div className="whitespace-nowrap">
               <div className="flex items-center gap-2">
-                <span className="font-bold tracking-tight text-base text-foreground">SCOUT</span>
-                <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <span className="font-bold tracking-tight text-base text-slate-900">SCOUT</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-[#0071e3] border border-blue-200/60 whitespace-nowrap">
                   GenAI Fund
                 </span>
               </div>
-              <p className="text-[11px] text-muted-foreground">SEA AI & Robotics Founder Radar</p>
+              <p className="text-[11px] text-slate-500 font-medium">SEA AI & Robotics Founder Radar</p>
             </div>
           </div>
 
-          {/* View Tabs */}
-          <nav className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/60">
+          {/* Segmented Pill Navigation - whitespace-nowrap & clean badges */}
+          <nav className="flex items-center gap-1 bg-slate-200/50 backdrop-blur-xl p-1 rounded-2xl border border-white/80 shadow-inner shrink-0 flex-nowrap">
             {[
               { id: "campaigns", label: "Campaigns", icon: Layers },
               { id: "discovery", label: "Discovery & Fit", icon: Compass, count: stats.discovered },
-              { id: "review", label: "Review Queue", icon: CheckCircle2, count: stats.drafted, badgeColor: "bg-amber-500" },
-              { id: "tracker", label: "Outreach & Inbox", icon: Inbox, count: stats.replied, badgeColor: "bg-emerald-500" },
+              { id: "review", label: "Review Queue", icon: CheckCircle2, count: stats.drafted },
+              { id: "tracker", label: "Outreach & Inbox", icon: Inbox, count: stats.replied },
               { id: "settings", label: "Settings", icon: SettingsIcon },
-            ].map(({ id, label, icon: Icon, count, badgeColor }) => (
+            ].map(({ id, label, icon: Icon, count }) => (
               <button
                 key={id}
                 onClick={() => setView(id as View)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap shrink-0 transition-all ${
                   view === id
-                    ? "bg-card text-foreground shadow-sm border border-border/80"
-                    : "text-muted-foreground hover:text-foreground hover:bg-card/40"
+                    ? "bg-white/95 text-slate-900 shadow-sm shadow-slate-900/5 font-semibold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{label}</span>
+                <Icon className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+                <span className="whitespace-nowrap">{label}</span>
                 {count !== undefined && count > 0 && (
-                  <span
-                    className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-semibold text-white ${
-                      badgeColor || "bg-zinc-700"
-                    }`}
-                  >
-                    {count}
+                  <span className="ml-1 text-[11px] font-semibold text-slate-400 whitespace-nowrap">
+                    ({count})
                   </span>
                 )}
               </button>
@@ -566,20 +554,20 @@ export default function HomePage() {
           </nav>
 
           {/* Active Campaign / Mode Indicator */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {selectedCampaign && (
-              <div className="hidden md:flex items-center gap-2 border border-border/60 rounded-lg px-2.5 py-1 bg-card/40 text-xs">
-                <span className="text-muted-foreground">Active Radar:</span>
-                <span className="font-semibold text-foreground truncate max-w-[140px]">
+              <div className="hidden lg:flex items-center gap-2 border border-white/80 rounded-2xl px-3 py-1.5 bg-white/70 backdrop-blur-md shadow-2xs text-xs whitespace-nowrap shrink-0">
+                <span className="text-slate-500 whitespace-nowrap">Radar:</span>
+                <span className="font-semibold text-slate-900 truncate max-w-[130px] whitespace-nowrap">
                   {selectedCampaign.name}
                 </span>
                 <button
                   onClick={(e) => toggleCampaignMode(selectedCampaign, e)}
                   title="Click to toggle between Sandbox and Live X API"
-                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                  className="cursor-pointer hover:opacity-85 transition-opacity whitespace-nowrap shrink-0"
                 >
-                  <Badge variant={selectedCampaign.mode === "sandbox" ? "success" : "destructive"}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${selectedCampaign.mode === "sandbox" ? "bg-emerald-400" : "bg-rose-400"}`} />
+                  <Badge variant={selectedCampaign.mode === "sandbox" ? "success" : "destructive"} className="whitespace-nowrap shrink-0">
+                    <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${selectedCampaign.mode === "sandbox" ? "bg-emerald-500" : "bg-rose-500"}`} />
                     {selectedCampaign.mode === "sandbox" ? "Sandbox ($0)" : "Live X API"}
                   </Badge>
                 </button>
@@ -589,62 +577,62 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ── Executive KPI Pipeline Metrics Strip ───────────── */}
-      <div className="border-b border-border/60 bg-card/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div className="p-3 rounded-xl border border-border/60 bg-card/50 flex flex-col justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+      {/* ── Apple Liquid Glass KPI Strip ───────────────────── */}
+      <div className="border-b border-white/50 bg-white/40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 py-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
+            <div className="p-3.5 rounded-2xl border border-white/80 bg-white/75 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-black/[0.02] flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                 Total Scanned
-                <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                <Globe className="w-3.5 h-3.5 text-slate-400" />
               </span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-bold font-mono text-foreground">{stats.total}</span>
-                <span className="text-xs text-muted-foreground">profiles</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-slate-900">{stats.total}</span>
+                <span className="text-xs text-slate-500">profiles</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col justify-between">
-              <span className="text-[11px] font-medium text-emerald-400/90 uppercase tracking-wider flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl border border-emerald-200/70 bg-emerald-50/40 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider flex items-center justify-between">
                 High-Signal Fit
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
               </span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-bold font-mono text-emerald-300">{stats.highFit}</span>
-                <span className="text-xs text-emerald-400/70">score ≥ 70%</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-emerald-800">{stats.highFit}</span>
+                <span className="text-xs text-emerald-600/80 font-medium">score ≥ 70%</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 flex flex-col justify-between">
-              <span className="text-[11px] font-medium text-amber-300/90 uppercase tracking-wider flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl border border-amber-200/70 bg-amber-50/40 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider flex items-center justify-between">
                 Review Queue
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
               </span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-bold font-mono text-amber-200">{stats.drafted}</span>
-                <span className="text-xs text-amber-300/70">awaiting review</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-amber-800">{stats.drafted}</span>
+                <span className="text-xs text-amber-700/80 font-medium">awaiting review</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 flex flex-col justify-between">
-              <span className="text-[11px] font-medium text-blue-300/90 uppercase tracking-wider flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl border border-blue-200/70 bg-blue-50/40 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-blue-800 uppercase tracking-wider flex items-center justify-between">
                 Outreach Sent
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0071e3]" />
               </span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-bold font-mono text-blue-200">{stats.sent}</span>
-                <span className="text-xs text-blue-300/70">0 duplicates</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-blue-900">{stats.sent}</span>
+                <span className="text-xs text-blue-600 font-medium">0 duplicates</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 flex flex-col justify-between">
-              <span className="text-[11px] font-medium text-indigo-300/90 uppercase tracking-wider flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl border border-indigo-200/70 bg-indigo-50/40 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-indigo-800 uppercase tracking-wider flex items-center justify-between">
                 Reply Yield
-                <TrendingUp className="w-3.5 h-3.5 text-indigo-400" />
+                <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
               </span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-bold font-mono text-indigo-200">{stats.replied}</span>
-                <span className="text-xs text-indigo-300/70">({stats.conversion}%)</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-indigo-900">{stats.replied}</span>
+                <span className="text-xs text-indigo-600 font-medium">({stats.conversion}%)</span>
               </div>
             </div>
           </div>
@@ -660,23 +648,23 @@ export default function HomePage() {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight text-foreground">Target Radars & Campaigns</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Target Radars & Campaigns</h1>
+                <p className="text-sm text-slate-500 mt-0.5">
                   Configure search segments, keywords, and seed accounts across Southeast Asia AI ecosystems.
                 </p>
               </div>
-              <Button onClick={() => setShowCreate(!showCreate)} className="gap-2">
+              <Button onClick={() => setShowCreate(!showCreate)} className="gap-2 shadow-md">
                 <Sparkles className="w-4 h-4" />
                 {showCreate ? "Close Panel" : "Create New Radar"}
               </Button>
             </div>
 
-            {/* Campaign Creator Drawer/Card */}
+            {/* Campaign Creator Card */}
             {showCreate && (
-              <Card className="border-blue-500/30 bg-card shadow-xl ring-1 ring-blue-500/20">
+              <Card className="border-blue-200/80 bg-white/90 shadow-xl ring-1 ring-blue-500/10">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Radio className="w-4 h-4 text-blue-400" />
+                  <CardTitle className="text-lg flex items-center gap-2 text-slate-900">
+                    <Radio className="w-4 h-4 text-[#0071e3]" />
                     Configure New AI / Robotics Target Radar
                   </CardTitle>
                   <CardDescription>
@@ -686,7 +674,7 @@ export default function HomePage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1 block">
                         Radar / Campaign Name
                       </label>
                       <Input
@@ -696,7 +684,7 @@ export default function HomePage() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1 block">
                         Seed Handles (comma-separated)
                       </label>
                       <Input
@@ -708,7 +696,7 @@ export default function HomePage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1 block">
                       Target Focus Description
                     </label>
                     <Textarea
@@ -720,7 +708,7 @@ export default function HomePage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1 block">
                       Target Keywords (comma-separated)
                     </label>
                     <Input
@@ -731,15 +719,15 @@ export default function HomePage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5 block">
                       Execution Mode
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <label
-                        className={`flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${
+                        className={`flex items-start gap-3 p-3.5 border rounded-2xl cursor-pointer transition-all ${
                           newMode === "sandbox"
-                            ? "border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/30"
-                            : "border-border bg-card/60 hover:bg-card"
+                            ? "border-[#0071e3] bg-blue-50/60 ring-2 ring-blue-500/20"
+                            : "border-slate-200/80 bg-white/70 hover:bg-white"
                         }`}
                       >
                         <input
@@ -751,21 +739,21 @@ export default function HomePage() {
                           className="mt-1"
                         />
                         <div>
-                          <div className="font-semibold text-sm text-foreground flex items-center gap-1.5">
-                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                          <div className="font-semibold text-sm text-slate-900 flex items-center gap-1.5">
+                            <ShieldCheck className="w-4 h-4 text-emerald-600" />
                             Safe Sandbox Mode ($0 Cost)
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                          <div className="text-xs text-slate-500 mt-1 leading-relaxed">
                             Zero API spend. Test end-to-end with 30 curated Southeast Asian AI & robotics builders with realistic bios, signal tweets, and simulated responses.
                           </div>
                         </div>
                       </label>
 
                       <label
-                        className={`flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${
+                        className={`flex items-start gap-3 p-3.5 border rounded-2xl cursor-pointer transition-all ${
                           newMode === "live"
-                            ? "border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/30"
-                            : "border-border bg-card/60 hover:bg-card"
+                            ? "border-[#0071e3] bg-blue-50/60 ring-2 ring-blue-500/20"
+                            : "border-slate-200/80 bg-white/70 hover:bg-white"
                         }`}
                       >
                         <input
@@ -777,11 +765,11 @@ export default function HomePage() {
                           className="mt-1"
                         />
                         <div>
-                          <div className="font-semibold text-sm text-foreground flex items-center gap-1.5">
-                            <Zap className="w-4 h-4 text-amber-400" />
+                          <div className="font-semibold text-sm text-slate-900 flex items-center gap-1.5">
+                            <Zap className="w-4 h-4 text-amber-600" />
                             Live X API v2 (BYOK Mode)
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                          <div className="text-xs text-slate-500 mt-1 leading-relaxed">
                             Connects directly to X API v2 endpoints with Token-Bucket rate limiting (15 DMs/15 min). Requires valid X Bearer & OAuth tokens in Settings.
                           </div>
                         </div>
@@ -801,7 +789,7 @@ export default function HomePage() {
             )}
 
             {/* Campaign Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {campaigns.map((c) => {
                 const isSelected = selectedCampaign?.id === c.id;
                 return (
@@ -811,14 +799,14 @@ export default function HomePage() {
                       setSelectedCampaign(c);
                       setView("discovery");
                     }}
-                    className={`cursor-pointer group hover:border-blue-500/50 hover:shadow-lg transition-all ${
-                      isSelected ? "ring-2 ring-blue-500 border-blue-500/60 bg-blue-500/5" : "bg-card/80"
+                    className={`cursor-pointer group hover:border-[#0071e3]/60 hover:shadow-xl transition-all ${
+                      isSelected ? "ring-2 ring-[#0071e3] border-[#0071e3]/80 bg-white/90" : "bg-white/75"
                     }`}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start gap-2">
                         <div>
-                          <CardTitle className="text-base group-hover:text-blue-400 transition-colors">
+                          <CardTitle className="text-base text-slate-900 group-hover:text-[#0071e3] transition-colors">
                             {c.name}
                           </CardTitle>
                           <CardDescription className="line-clamp-2 mt-1">
@@ -829,10 +817,10 @@ export default function HomePage() {
                           type="button"
                           onClick={(e) => toggleCampaignMode(c, e)}
                           title="Click to toggle between Sandbox and Live mode"
-                          className="cursor-pointer"
+                          className="cursor-pointer shrink-0"
                         >
-                          <Badge variant={c.mode === "sandbox" ? "success" : "destructive"}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${c.mode === "sandbox" ? "bg-emerald-400" : "bg-rose-400"}`} />
+                          <Badge variant={c.mode === "sandbox" ? "success" : "destructive"} className="whitespace-nowrap shrink-0">
+                            <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${c.mode === "sandbox" ? "bg-emerald-500" : "bg-rose-500"}`} />
                             {c.mode === "sandbox" ? "Sandbox" : "Live X"}
                           </Badge>
                         </button>
@@ -843,19 +831,19 @@ export default function HomePage() {
                         {(c.keywords || []).map((kw) => (
                           <span
                             key={kw}
-                            className="text-[11px] px-2 py-0.5 rounded-md bg-secondary/80 text-muted-foreground border border-border/50"
+                            className="text-[11px] px-2.5 py-0.5 rounded-lg bg-slate-100/90 text-slate-600 border border-slate-200/60 font-medium"
                           >
                             #{kw}
                           </span>
                         ))}
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Globe className="w-3.5 h-3.5 text-zinc-400" />
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
+                        <span className="flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-slate-400" />
                           SEA AI Ecosystem
                         </span>
-                        <span className="text-blue-400 font-medium group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                        <span className="text-[#0071e3] font-semibold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
                           Open Radar <ChevronRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
@@ -873,15 +861,15 @@ export default function HomePage() {
         {view === "discovery" && (
           <div className="space-y-4">
             {/* Header Toolbar */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card/60 p-4 rounded-xl border border-border/70 backdrop-blur-md">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 p-4 rounded-2xl border border-white/90 shadow-sm backdrop-blur-xl">
               <div>
-                <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  <Compass className="w-5 h-5 text-blue-400" />
+                <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-[#0071e3]" />
                   Candidate Discovery & Qualification
                 </h1>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Radar: <strong className="text-foreground">{selectedCampaign?.name}</strong> · Mode:{" "}
-                  <span className="font-mono text-emerald-400">{selectedCampaign?.mode.toUpperCase()}</span>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Radar: <strong className="text-slate-900">{selectedCampaign?.name}</strong> · Mode:{" "}
+                  <span className="font-mono text-emerald-700 font-semibold">{selectedCampaign?.mode.toUpperCase()}</span>
                 </p>
               </div>
 
@@ -894,7 +882,7 @@ export default function HomePage() {
                   disabled={!selectedCampaign || loading}
                   className="gap-1.5"
                 >
-                  <Search className="w-3.5 h-3.5 text-blue-400" />
+                  <Search className="w-3.5 h-3.5 text-[#0071e3]" />
                   Index Candidates
                 </Button>
                 <Button
@@ -902,16 +890,16 @@ export default function HomePage() {
                   size="sm"
                   onClick={runScoring}
                   disabled={!selectedCampaign || loading || stats.discovered === 0}
-                  className="gap-1.5 border-emerald-500/30 hover:border-emerald-500/50"
+                  className="gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                   Run Fit Scoring
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => runDrafting(0.4)}
                   disabled={!selectedCampaign || loading || stats.scored === 0}
-                  className="gap-1.5 bg-blue-600 hover:bg-blue-500"
+                  className="gap-1.5 shadow-md"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Draft DMs (Fit ≥ 40%)
@@ -920,14 +908,14 @@ export default function HomePage() {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 bg-muted/40 p-2.5 rounded-xl border border-border/60">
+            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/70 p-3 rounded-2xl border border-white/80 shadow-2xs backdrop-blur-xl">
               <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter by founder name, handle (@username), or research focus..."
-                  className="pl-9 h-9 bg-card/60"
+                  className="pl-10 h-9 bg-white/80"
                 />
               </div>
 
@@ -935,7 +923,7 @@ export default function HomePage() {
                 <select
                   value={countryFilter}
                   onChange={(e) => setCountryFilter(e.target.value)}
-                  className="h-9 rounded-lg border border-border bg-card/80 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="h-9 rounded-xl border border-slate-200/90 bg-white/80 px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
                 >
                   <option value="ALL">All SEA Countries</option>
                   <option value="SG">🇸🇬 Singapore</option>
@@ -948,7 +936,7 @@ export default function HomePage() {
                 <select
                   value={minScoreFilter}
                   onChange={(e) => setMinScoreFilter(parseFloat(e.target.value))}
-                  className="h-9 rounded-lg border border-border bg-card/80 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="h-9 rounded-xl border border-slate-200/90 bg-white/80 px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
                 >
                   <option value="0">All Scores</option>
                   <option value="0.7">High Fit Only (≥ 70%)</option>
@@ -958,25 +946,25 @@ export default function HomePage() {
             </div>
 
             {/* Prospects Data Grid */}
-            <div className="border border-border/80 rounded-xl overflow-hidden bg-card/60 shadow-sm">
+            <div className="border border-white/90 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-muted/60 border-b border-border text-muted-foreground font-semibold uppercase tracking-wider">
+                  <thead className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-semibold uppercase tracking-wider">
                     <tr>
-                      <th className="py-3 px-4">Candidate Profile</th>
-                      <th className="py-3 px-4">Location</th>
-                      <th className="py-3 px-4">Followers</th>
-                      <th className="py-3 px-4">AI Fit Evaluation</th>
-                      <th className="py-3 px-4">Pipeline Status</th>
-                      <th className="py-3 px-4 text-right">Dossier</th>
+                      <th className="py-3.5 px-4">Candidate Profile</th>
+                      <th className="py-3.5 px-4">Location</th>
+                      <th className="py-3.5 px-4">Followers</th>
+                      <th className="py-3.5 px-4">AI Fit Evaluation</th>
+                      <th className="py-3.5 px-4">Pipeline Status</th>
+                      <th className="py-3.5 px-4 text-right">Dossier</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/50">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredProspects.map((p) => (
                       <tr
                         key={p.id}
                         onClick={() => setInspectProspect(p)}
-                        className="hover:bg-muted/40 transition-colors cursor-pointer group"
+                        className="hover:bg-blue-50/40 transition-colors cursor-pointer group"
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
@@ -984,24 +972,24 @@ export default function HomePage() {
                               <img
                                 src={p.xProfileImageUrl || `https://avatar.vercel.sh/${p.xUsername}`}
                                 alt=""
-                                className="h-9 w-9 rounded-full bg-muted border border-border object-cover"
+                                className="h-9 w-9 rounded-full bg-slate-100 border border-slate-200 object-cover shadow-2xs"
                               />
                               {(p.fitScore || 0) >= 0.75 && (
-                                <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-background flex items-center justify-center text-[8px] text-white font-bold">
+                                <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-[8px] text-white font-bold">
                                   ✓
                                 </span>
                               )}
                             </div>
                             <div>
-                              <div className="font-semibold text-foreground group-hover:text-blue-400 transition-colors flex items-center gap-1.5">
+                              <div className="font-semibold text-slate-900 group-hover:text-[#0071e3] transition-colors flex items-center gap-1.5">
                                 {p.xDisplayName || p.xUsername}
                               </div>
-                              <div className="text-muted-foreground text-[11px] font-mono">@{p.xUsername}</div>
+                              <div className="text-slate-500 text-[11px] font-mono">@{p.xUsername}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-muted-foreground">{p.xLocation || "—"}</td>
-                        <td className="py-3 px-4 font-mono text-muted-foreground">
+                        <td className="py-3 px-4 text-slate-600">{p.xLocation || "—"}</td>
+                        <td className="py-3 px-4 font-mono text-slate-600">
                           {p.xFollowerCount?.toLocaleString() || "—"}
                         </td>
                         <td className="py-3 px-4">{getFitBadge(p.fitScore)}</td>
@@ -1010,9 +998,9 @@ export default function HomePage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-xs text-muted-foreground group-hover:text-foreground"
+                            className="h-7 px-2.5 text-xs text-slate-500 group-hover:text-slate-900 hover:bg-slate-100/80"
                           >
-                            <Eye className="w-3.5 h-3.5 mr-1" />
+                            <Eye className="w-3.5 h-3.5 mr-1 text-[#0071e3]" />
                             Inspect
                           </Button>
                         </td>
@@ -1020,7 +1008,7 @@ export default function HomePage() {
                     ))}
                     {filteredProspects.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                        <td colSpan={6} className="py-12 text-center text-slate-500">
                           No profiles matching current filter. Click &ldquo;Index Candidates&rdquo; to start.
                         </td>
                       </tr>
@@ -1030,25 +1018,25 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Candidate Dossier Slide-Over / Modal */}
+            {/* Candidate Dossier Modal */}
             {inspectProspect && (
-              <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col bg-card border-border shadow-2xl animate-in zoom-in-95">
-                  <CardHeader className="border-b border-border/60 pb-4">
+              <div className="fixed inset-0 bg-slate-900/30 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col bg-white/95 border-white shadow-2xl rounded-3xl animate-in zoom-in-95">
+                  <CardHeader className="border-b border-slate-100 pb-4">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
                         <img
                           src={inspectProspect.xProfileImageUrl || `https://avatar.vercel.sh/${inspectProspect.xUsername}`}
                           alt=""
-                          className="h-12 w-12 rounded-full border border-border"
+                          className="h-12 w-12 rounded-full border border-slate-200 shadow-sm object-cover"
                         />
                         <div>
-                          <CardTitle className="text-base flex items-center gap-2">
+                          <CardTitle className="text-base flex items-center gap-2 text-slate-900">
                             {inspectProspect.xDisplayName}
-                            <span className="text-xs font-mono text-muted-foreground">@{inspectProspect.xUsername}</span>
+                            <span className="text-xs font-mono text-slate-500">@{inspectProspect.xUsername}</span>
                           </CardTitle>
-                          <CardDescription className="flex items-center gap-2 mt-0.5">
-                            <Globe className="w-3 h-3" /> {inspectProspect.xLocation || "SEA Region"} ·{" "}
+                          <CardDescription className="flex items-center gap-2 mt-0.5 text-slate-500">
+                            <Globe className="w-3 h-3 text-slate-400" /> {inspectProspect.xLocation || "SEA Region"} ·{" "}
                             {inspectProspect.xFollowerCount?.toLocaleString()} followers
                           </CardDescription>
                         </div>
@@ -1061,8 +1049,8 @@ export default function HomePage() {
                   <CardContent className="space-y-4 pt-4 overflow-y-auto flex-1">
                     {/* Bio */}
                     <div>
-                      <span className="text-xs font-semibold uppercase text-muted-foreground">Twitter Bio</span>
-                      <p className="text-sm mt-1 p-3 rounded-lg bg-muted/40 border border-border/50 text-foreground">
+                      <span className="text-xs font-semibold uppercase text-slate-500">Twitter Bio</span>
+                      <p className="text-sm mt-1 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 text-slate-800 leading-relaxed">
                         {inspectProspect.xBio}
                       </p>
                     </div>
@@ -1070,20 +1058,20 @@ export default function HomePage() {
                     {/* Fit Assessment */}
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-semibold uppercase text-muted-foreground">
+                        <span className="text-xs font-semibold uppercase text-slate-500">
                           AI Qualification Thesis
                         </span>
                         {getFitBadge(inspectProspect.fitScore)}
                       </div>
-                      <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs space-y-1.5">
+                      <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-200/70 text-xs space-y-1.5 text-slate-800">
                         {inspectProspect.fitReasoning ? (
                           inspectProspect.fitReasoning.split("\n").map((r, i) => (
-                            <p key={i} className="text-foreground/90 leading-relaxed">
+                            <p key={i} className="leading-relaxed">
                               • {r}
                             </p>
                           ))
                         ) : (
-                          <span className="text-muted-foreground">No fit reasoning generated yet. Run Fit Scoring first.</span>
+                          <span className="text-slate-500">No fit reasoning generated yet. Run Fit Scoring first.</span>
                         )}
                       </div>
                     </div>
@@ -1091,20 +1079,20 @@ export default function HomePage() {
                     {/* Verbatim Evidence Citations */}
                     {inspectProspect.evidenceSources && inspectProspect.evidenceSources.length > 0 && (
                       <div>
-                        <span className="text-xs font-semibold uppercase text-amber-300 flex items-center gap-1.5 mb-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5" />
+                        <span className="text-xs font-semibold uppercase text-amber-800 flex items-center gap-1.5 mb-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                           Grounded Evidence Sources (Zero Hallucination)
                         </span>
                         <div className="space-y-2">
                           {inspectProspect.evidenceSources.map((ev, i) => (
                             <div
                               key={i}
-                              className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200"
+                              className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900"
                             >
-                              <div className="font-semibold text-amber-300">
+                              <div className="font-semibold text-amber-800">
                                 [{ev.type.toUpperCase()}] &ldquo;{ev.quote}&rdquo;
                               </div>
-                              <p className="text-muted-foreground mt-1">{ev.relevance}</p>
+                              <p className="text-slate-600 mt-1">{ev.relevance}</p>
                             </div>
                           ))}
                         </div>
@@ -1114,14 +1102,14 @@ export default function HomePage() {
                     {/* Signal Tweets */}
                     {inspectProspect.recentTweets && inspectProspect.recentTweets.length > 0 && (
                       <div>
-                        <span className="text-xs font-semibold uppercase text-muted-foreground mb-1.5 block">
+                        <span className="text-xs font-semibold uppercase text-slate-500 mb-1.5 block">
                           Recent Signal Tweets
                         </span>
                         <div className="space-y-2">
                           {inspectProspect.recentTweets.slice(0, 3).map((t, i) => (
-                            <div key={i} className="p-2.5 rounded-lg bg-muted/40 border border-border/50 text-xs">
-                              <p className="text-foreground/90">{t.text}</p>
-                              <div className="flex gap-4 mt-2 text-[11px] text-muted-foreground">
+                            <div key={i} className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 text-xs">
+                              <p className="text-slate-800">{t.text}</p>
+                              <div className="flex gap-4 mt-2 text-[11px] text-slate-500">
                                 <span>❤️ {t.metrics.likes} likes</span>
                                 <span>🔁 {t.metrics.retweets} retweets</span>
                                 <span>💬 {t.metrics.replies} replies</span>
@@ -1132,8 +1120,8 @@ export default function HomePage() {
                       </div>
                     )}
                   </CardContent>
-                  <CardFooter className="justify-between border-t border-border/60 pt-3">
-                    <span className="text-xs text-muted-foreground">
+                  <CardFooter className="justify-between border-t border-slate-100 pt-3.5">
+                    <span className="text-xs text-slate-500">
                       Status: {getStatusBadge(inspectProspect.status)}
                     </span>
                     <Button
@@ -1158,18 +1146,18 @@ export default function HomePage() {
         {view === "review" && (
           <div className="space-y-4">
             {/* Review Header Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card/60 p-4 rounded-xl border border-border/70 backdrop-blur-md">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 p-4 rounded-2xl border border-white/90 shadow-sm backdrop-blur-xl">
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-amber-600" />
                     Human-in-the-Loop Review Queue
                   </h1>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-mono bg-amber-500/10 text-amber-300 border border-amber-500/25">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
                     {stats.drafted} Pending · {stats.approved} Approved
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Review every drafted DM against real evidence. Edit inline before approving. Safe execution guaranteed.
                 </p>
               </div>
@@ -1177,7 +1165,7 @@ export default function HomePage() {
               <Button
                 onClick={sendApproved}
                 disabled={stats.approved === 0 || loading}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20"
+                className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
               >
                 <Send className="w-4 h-4" />
                 Safely Send {stats.approved} Approved DMs
@@ -1187,18 +1175,18 @@ export default function HomePage() {
             {currentReview ? (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left Pane: Candidate Dossier (5 cols) */}
-                <Card className="lg:col-span-5 bg-card/80 border-border/80 flex flex-col">
-                  <CardHeader className="border-b border-border/60 pb-3">
+                <Card className="lg:col-span-5 bg-white/85 border-white/90 flex flex-col shadow-sm">
+                  <CardHeader className="border-b border-slate-100 pb-3.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <img
                           src={currentReview.xProfileImageUrl || `https://avatar.vercel.sh/${currentReview.xUsername}`}
                           alt=""
-                          className="h-12 w-12 rounded-full border border-border/80 object-cover"
+                          className="h-12 w-12 rounded-full border border-slate-200 object-cover shadow-2xs"
                         />
                         <div>
-                          <CardTitle className="text-base text-foreground">{currentReview.xDisplayName}</CardTitle>
-                          <CardDescription className="font-mono text-muted-foreground">
+                          <CardTitle className="text-base text-slate-900">{currentReview.xDisplayName}</CardTitle>
+                          <CardDescription className="font-mono text-slate-500">
                             @{currentReview.xUsername} · {currentReview.xLocation}
                           </CardDescription>
                         </div>
@@ -1209,10 +1197,10 @@ export default function HomePage() {
                   <CardContent className="space-y-4 pt-4 text-xs flex-1">
                     {/* Bio */}
                     <div>
-                      <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider block mb-1">
+                      <span className="font-semibold text-slate-500 uppercase text-[10px] tracking-wider block mb-1">
                         Twitter / X Bio
                       </span>
-                      <p className="p-2.5 rounded-lg bg-muted/40 border border-border/50 text-foreground/90 leading-relaxed">
+                      <p className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 text-slate-800 leading-relaxed">
                         {currentReview.xBio}
                       </p>
                     </div>
@@ -1220,10 +1208,10 @@ export default function HomePage() {
                     {/* Thesis */}
                     {currentReview.fitReasoning && (
                       <div>
-                        <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider block mb-1">
+                        <span className="font-semibold text-slate-500 uppercase text-[10px] tracking-wider block mb-1">
                           AI Qualification Reasoning
                         </span>
-                        <div className="p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/20 text-blue-200/90 space-y-1">
+                        <div className="p-3 rounded-2xl bg-blue-50/60 border border-blue-200/70 text-slate-800 space-y-1">
                           {currentReview.fitReasoning.split("\n").map((r, i) => (
                             <p key={i}>• {r}</p>
                           ))}
@@ -1234,18 +1222,18 @@ export default function HomePage() {
                     {/* Verbatim Evidence Citations */}
                     {currentReview.evidenceSources && currentReview.evidenceSources.length > 0 && (
                       <div>
-                        <span className="font-semibold text-amber-300 uppercase text-[10px] tracking-wider flex items-center gap-1 mb-1">
-                          <ShieldCheck className="w-3 h-3" />
+                        <span className="font-semibold text-amber-800 uppercase text-[10px] tracking-wider flex items-center gap-1 mb-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                           Grounded Evidence Sources (Zero Hallucination)
                         </span>
                         <div className="space-y-1.5">
                           {currentReview.evidenceSources.map((e, i) => (
                             <div
                               key={i}
-                              className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-200"
+                              className="p-2.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900"
                             >
-                              <span className="font-semibold text-amber-300">[{e.type}]</span> &ldquo;{e.quote}&rdquo;
-                              <p className="text-muted-foreground mt-0.5 text-[11px]">{e.relevance}</p>
+                              <span className="font-semibold text-amber-800">[{e.type}]</span> &ldquo;{e.quote}&rdquo;
+                              <p className="text-slate-600 mt-0.5 text-[11px]">{e.relevance}</p>
                             </div>
                           ))}
                         </div>
@@ -1255,12 +1243,12 @@ export default function HomePage() {
                     {/* Signal Tweets */}
                     {currentReview.recentTweets && currentReview.recentTweets.length > 0 && (
                       <div>
-                        <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider block mb-1">
+                        <span className="font-semibold text-slate-500 uppercase text-[10px] tracking-wider block mb-1">
                           Signal Tweet Reference
                         </span>
-                        <div className="p-2.5 rounded-lg bg-muted/40 border border-border/50">
-                          <p className="text-foreground/90 italic">&ldquo;{currentReview.recentTweets[0].text}&rdquo;</p>
-                          <div className="flex gap-3 mt-1.5 text-[10px] text-muted-foreground">
+                        <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70">
+                          <p className="text-slate-800 italic">&ldquo;{currentReview.recentTweets[0].text}&rdquo;</p>
+                          <div className="flex gap-3 mt-1.5 text-[10px] text-slate-500">
                             <span>❤️ {currentReview.recentTweets[0].metrics.likes}</span>
                             <span>🔁 {currentReview.recentTweets[0].metrics.retweets}</span>
                           </div>
@@ -1271,13 +1259,13 @@ export default function HomePage() {
                 </Card>
 
                 {/* Right Pane: Message Studio & Approval (7 cols) */}
-                <Card className="lg:col-span-7 bg-card/80 border-border/80 flex flex-col justify-between">
+                <Card className="lg:col-span-7 bg-white/85 border-white/90 flex flex-col justify-between shadow-sm">
                   <div>
-                    <CardHeader className="border-b border-border/60 pb-3">
+                    <CardHeader className="border-b border-slate-100 pb-3.5">
                       <div className="flex justify-between items-center">
                         <div>
-                          <CardTitle className="text-base text-foreground flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4 text-blue-400" />
+                          <CardTitle className="text-base text-slate-900 flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4 text-[#0071e3]" />
                             Personalized Outreach Message Studio
                           </CardTitle>
                           <CardDescription>
@@ -1286,21 +1274,21 @@ export default function HomePage() {
                         </div>
 
                         {/* Keyboard shortcut tips */}
-                        <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                          <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded font-mono">A</kbd> Approve
-                          <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded font-mono ml-1">R</kbd> Reject
-                          <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded font-mono ml-1">Space</kbd> Skip
+                        <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                          <kbd className="px-2 py-0.5 bg-white border border-slate-200 rounded-md shadow-2xs font-mono">A</kbd> Approve
+                          <kbd className="px-2 py-0.5 bg-white border border-slate-200 rounded-md shadow-2xs font-mono ml-1">R</kbd> Reject
+                          <kbd className="px-2 py-0.5 bg-white border border-slate-200 rounded-md shadow-2xs font-mono ml-1">Space</kbd> Skip
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-4">
                       {/* Tone & Context Pill */}
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1">
-                          <UserCheck className="w-3.5 h-3.5 text-blue-400" />
+                        <span className="text-slate-600 flex items-center gap-1.5 font-medium">
+                          <UserCheck className="w-3.5 h-3.5 text-[#0071e3]" />
                           Sender Identity: <strong>GenAI Fund Team</strong>
                         </span>
-                        <span className="font-mono text-muted-foreground">
+                        <span className="font-mono text-slate-500">
                           {(editingDraft || currentReview.draftMessage || "").length} / 280 chars
                         </span>
                       </div>
@@ -1313,26 +1301,26 @@ export default function HomePage() {
                         onFocus={() => {
                           if (!editingDraft) setEditingDraft(currentReview.draftMessage || "");
                         }}
-                        className="font-sans text-sm leading-relaxed bg-muted/30 border-border/80 focus:border-blue-500"
+                        className="font-sans text-sm leading-relaxed bg-slate-50/70 border-slate-200/90 focus:bg-white text-slate-900"
                         placeholder="Draft message will appear here..."
                       />
 
                       {/* Guardrail Checklist */}
-                      <div className="p-3 rounded-lg border border-border/60 bg-muted/20 text-xs space-y-1.5">
-                        <div className="font-semibold text-muted-foreground text-[10px] uppercase tracking-wider mb-1">
+                      <div className="p-3.5 rounded-2xl border border-emerald-200/70 bg-emerald-50/40 text-xs space-y-1.5">
+                        <div className="font-semibold text-emerald-800 text-[10px] uppercase tracking-wider mb-1">
                           Automated FDE Guardrail Verification
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-[11px]">
-                          <span className="flex items-center gap-1.5 text-emerald-400">
+                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
                             <Check className="w-3.5 h-3.5" /> Verbatim evidence cited
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-400">
+                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
                             <Check className="w-3.5 h-3.5" /> Zero invented familiarity
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-400">
+                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
                             <Check className="w-3.5 h-3.5" /> No recruiter/sales clichés
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-400">
+                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
                             <Check className="w-3.5 h-3.5" /> Anti-duplicate check: Passed
                           </span>
                         </div>
@@ -1340,7 +1328,7 @@ export default function HomePage() {
                     </CardContent>
                   </div>
 
-                  <CardFooter className="justify-between border-t border-border/60 pt-4 bg-muted/10">
+                  <CardFooter className="justify-between border-t border-slate-100 pt-4 bg-slate-50/40">
                     <Button
                       variant="outline"
                       size="sm"
@@ -1370,7 +1358,7 @@ export default function HomePage() {
                           handleApproval(currentReview.id, "approve");
                           setEditingDraft("");
                         }}
-                        className="gap-1.5 bg-blue-600 hover:bg-blue-500 text-white"
+                        className="gap-1.5 bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-sm shadow-blue-500/25"
                       >
                         <Check className="w-3.5 h-3.5" /> Approve & Queue [A]
                       </Button>
@@ -1379,19 +1367,17 @@ export default function HomePage() {
                 </Card>
               </div>
             ) : (
-              <Card className="text-center py-16 bg-card/60 border-dashed border-border/80">
+              <Card className="text-center py-16 bg-white/70 border-dashed border-slate-200">
                 <CardContent className="space-y-3">
-                  <div className="h-12 w-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground">Review Queue Cleared</h3>
-                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
+                  <h3 className="text-base font-semibold text-slate-900">Review Queue Cleared</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     {stats.approved > 0
                       ? `All drafts reviewed! You have ${stats.approved} approved DMs ready for safe send.`
                       : "No drafted DMs waiting for review. Run Fit Scoring and drafting from the Discovery tab."}
                   </p>
                   {stats.approved > 0 && (
-                    <Button onClick={sendApproved} className="mt-2 bg-emerald-600 hover:bg-emerald-500">
+                    <Button onClick={sendApproved} className="mt-2 bg-emerald-600 hover:bg-emerald-500 shadow-md">
                       Send {stats.approved} Approved DMs Now
                     </Button>
                   )}
@@ -1406,50 +1392,50 @@ export default function HomePage() {
             ═════════════════════════════════════════════════════ */}
         {view === "tracker" && (
           <div className="space-y-4">
-            {/* Header & Compliance Callout */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card/60 p-4 rounded-xl border border-border/70 backdrop-blur-md">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 p-4 rounded-2xl border border-white/90 shadow-sm backdrop-blur-xl">
               <div>
-                <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  <Inbox className="w-5 h-5 text-indigo-400" />
+                <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                  <Inbox className="w-5 h-5 text-indigo-600" />
                   Outreach Tracker & Live Inbox
                 </h1>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Track delivered conversations, manage inbound replies, and monitor platform health.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={syncReplies} disabled={!selectedCampaign || loading} className="gap-2">
-                <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+                <RefreshCw className="w-3.5 h-3.5 text-[#0071e3]" />
                 Sync Inbound Replies
               </Button>
             </div>
 
             {/* Platform Compliance Status Bar */}
-            <div className="p-3.5 rounded-xl border border-border/80 bg-muted/20 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div className="p-4 rounded-2xl border border-white/80 bg-white/75 backdrop-blur-xl grid grid-cols-1 md:grid-cols-3 gap-3 text-xs shadow-2xs">
               <div className="flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-foreground block font-medium">Zero Double-Messaging Invariant</strong>
-                  <span className="text-muted-foreground text-[11px]">
+                  <strong className="text-slate-900 block font-semibold">Zero Double-Messaging Invariant</strong>
+                  <span className="text-slate-500 text-[11px]">
                     Enforced by SQLite database constraint <code>UNIQUE(x_user_id)</code> + atomic state transitions.
                   </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
-                <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <Zap className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-foreground block font-medium">Token-Bucket Rate Limiter</strong>
-                  <span className="text-muted-foreground text-[11px]">
+                  <strong className="text-slate-900 block font-semibold">Token-Bucket Rate Limiter</strong>
+                  <span className="text-slate-500 text-[11px]">
                     Strictly bounds execution to 15 DMs per 15-minute window with auto-backoff on HTTP 429.
                   </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
-                <Lock className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <Lock className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-foreground block font-medium">Closed DMs Gatekeeper</strong>
-                  <span className="text-muted-foreground text-[11px]">
+                  <strong className="text-slate-900 block font-semibold">Closed DMs Gatekeeper</strong>
+                  <span className="text-slate-500 text-[11px]">
                     Safely marks HTTP 403 as <code>BLOCKED_DM_CLOSED</code> without wasting retries.
                   </span>
                 </div>
@@ -1459,38 +1445,38 @@ export default function HomePage() {
             {/* Conversational Split View */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[500px]">
               {/* Left Column: Conversations List (5 cols) */}
-              <Card className="lg:col-span-5 bg-card/80 border-border/80 flex flex-col overflow-hidden">
-                <CardHeader className="p-3 border-b border-border/60 bg-muted/30">
-                  <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              <Card className="lg:col-span-5 bg-white/80 border-white/90 flex flex-col overflow-hidden shadow-sm">
+                <CardHeader className="p-3.5 border-b border-slate-100 bg-slate-50/60">
+                  <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider">
                     Conversations ({outreachedProspects.length})
                   </span>
                 </CardHeader>
-                <div className="divide-y divide-border/40 overflow-y-auto flex-1 max-h-[550px]">
+                <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[550px]">
                   {outreachedProspects.map((p) => {
                     const isSelected = selectedThread?.id === p.id;
                     return (
                       <div
                         key={p.id}
                         onClick={() => setSelectedThreadId(p.id)}
-                        className={`p-3 cursor-pointer transition-colors ${
-                          isSelected ? "bg-blue-500/10 border-l-2 border-blue-500" : "hover:bg-muted/40"
+                        className={`p-3.5 cursor-pointer transition-colors ${
+                          isSelected ? "bg-blue-50/80 border-l-3 border-[#0071e3]" : "hover:bg-slate-50/60"
                         }`}
                       >
                         <div className="flex justify-between items-start mb-1">
-                          <span className="font-semibold text-xs text-foreground truncate max-w-[160px]">
+                          <span className="font-semibold text-xs text-slate-900 truncate max-w-[160px]">
                             {p.xDisplayName}
                           </span>
                           {getStatusBadge(p.status)}
                         </div>
-                        <p className="text-[11px] text-muted-foreground font-mono truncate">@{p.xUsername}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                        <p className="text-[11px] text-slate-500 font-mono truncate">@{p.xUsername}</p>
+                        <p className="text-xs text-slate-600 line-clamp-1 mt-1">
                           {p.replyPreview ? `💬 "${p.replyPreview}"` : p.draftMessage}
                         </p>
                       </div>
                     );
                   })}
                   {outreachedProspects.length === 0 && (
-                    <div className="p-8 text-center text-xs text-muted-foreground">
+                    <div className="p-8 text-center text-xs text-slate-500">
                       No outreach activity yet. Approve and send messages to view threads.
                     </div>
                   )}
@@ -1498,20 +1484,20 @@ export default function HomePage() {
               </Card>
 
               {/* Right Column: Simulated Thread Preview (7 cols) */}
-              <Card className="lg:col-span-7 bg-card/80 border-border/80 flex flex-col justify-between">
+              <Card className="lg:col-span-7 bg-white/85 border-white/90 flex flex-col justify-between shadow-sm">
                 {selectedThread ? (
                   <>
-                    <CardHeader className="p-4 border-b border-border/60 bg-muted/20">
+                    <CardHeader className="p-4 border-b border-slate-100 bg-slate-50/40">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
                           <img
                             src={selectedThread.xProfileImageUrl || `https://avatar.vercel.sh/${selectedThread.xUsername}`}
                             alt=""
-                            className="h-10 w-10 rounded-full border border-border"
+                            className="h-10 w-10 rounded-full border border-slate-200 shadow-2xs object-cover"
                           />
                           <div>
-                            <CardTitle className="text-sm font-semibold">{selectedThread.xDisplayName}</CardTitle>
-                            <CardDescription className="text-xs font-mono">
+                            <CardTitle className="text-sm font-semibold text-slate-900">{selectedThread.xDisplayName}</CardTitle>
+                            <CardDescription className="text-xs font-mono text-slate-500">
                               @{selectedThread.xUsername} · {selectedThread.xLocation}
                             </CardDescription>
                           </div>
@@ -1519,7 +1505,7 @@ export default function HomePage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-xs text-blue-400 gap-1"
+                          className="h-8 text-xs text-[#0071e3] gap-1"
                           onClick={() => window.open(`https://x.com/${selectedThread.xUsername}`, "_blank")}
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -1528,14 +1514,14 @@ export default function HomePage() {
                       </div>
                     </CardHeader>
 
-                    {/* Chat Bubble Area */}
+                    {/* Chat Bubble Area (Apple iMessage style) */}
                     <CardContent className="p-6 space-y-4 flex-1 overflow-y-auto max-h-[420px]">
                       {/* Outbound DM Bubble */}
                       <div className="flex flex-col items-end space-y-1">
-                        <span className="text-[10px] text-muted-foreground font-mono">
+                        <span className="text-[10px] text-slate-400 font-mono" suppressHydrationWarning>
                           Delivered via GenAI Fund · {selectedThread.sentAt ? new Date(selectedThread.sentAt).toLocaleTimeString() : "Sent"}
                         </span>
-                        <div className="max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm bg-blue-600 text-white text-xs leading-relaxed shadow-sm">
+                        <div className="max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm bg-[#0071e3] text-white text-xs leading-relaxed shadow-sm shadow-blue-500/20">
                           {selectedThread.draftMessage}
                         </div>
                       </div>
@@ -1543,32 +1529,32 @@ export default function HomePage() {
                       {/* Inbound Reply Bubble or Status */}
                       {selectedThread.replyPreview ? (
                         <div className="flex flex-col items-start space-y-1">
-                          <span className="text-[10px] text-indigo-300 font-mono flex items-center gap-1">
-                            <MessageSquare className="w-3 h-3" /> Inbound Reply from @{selectedThread.xUsername}
+                          <span className="text-[10px] text-indigo-700 font-medium font-mono flex items-center gap-1">
+                            <MessageSquare className="w-3 h-3 text-indigo-600" /> Inbound Reply from @{selectedThread.xUsername}
                           </span>
-                          <div className="max-w-[85%] p-3.5 rounded-2xl rounded-tl-sm bg-muted/80 border border-border/80 text-foreground text-xs leading-relaxed shadow-sm">
+                          <div className="max-w-[85%] p-3.5 rounded-2xl rounded-tl-sm bg-slate-100/90 border border-slate-200/80 text-slate-800 text-xs leading-relaxed shadow-2xs">
                             &ldquo;{selectedThread.replyPreview}&rdquo;
                           </div>
                         </div>
                       ) : selectedThread.status === "BLOCKED_DM_CLOSED" ? (
-                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs flex items-center gap-2">
-                          <Lock className="w-4 h-4 shrink-0" />
+                        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                          <Lock className="w-4 h-4 shrink-0 text-rose-600" />
                           <span>Recipient has closed direct messages. Blocked safely without burning rate limit.</span>
                         </div>
                       ) : (
-                        <div className="text-center py-6 text-xs text-muted-foreground italic">
+                        <div className="text-center py-6 text-xs text-slate-400 italic">
                           Awaiting reply from candidate...
                         </div>
                       )}
                     </CardContent>
 
-                    <CardFooter className="p-3 border-t border-border/60 bg-muted/20 flex justify-between text-xs text-muted-foreground">
+                    <CardFooter className="p-3.5 border-t border-slate-100 bg-slate-50/40 flex justify-between text-xs text-slate-500">
                       <span>Status: {getStatusBadge(selectedThread.status)}</span>
-                      <span>Zero Double-Messaging Active 🛡️</span>
+                      <span className="font-medium text-slate-700">Zero Double-Messaging Active 🛡️</span>
                     </CardFooter>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-full p-12 text-center text-xs text-muted-foreground">
+                  <div className="flex items-center justify-center h-full p-12 text-center text-xs text-slate-400">
                     Select a conversation from the left to view thread details.
                   </div>
                 )}
@@ -1583,17 +1569,17 @@ export default function HomePage() {
         {view === "settings" && (
           <div className="max-w-3xl space-y-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">Console Settings & Credentials</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Console Settings & Credentials</h1>
+              <p className="text-sm text-slate-500 mt-0.5">
                 Bring Your Own Keys (BYOK). Credentials are saved locally with zero external telemetry.
               </p>
             </div>
 
             {/* Diagnostics Panel */}
-            <Card className="border-border bg-card">
+            <Card className="border-white/90 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-blue-400" />
+                <CardTitle className="text-base flex items-center gap-2 text-slate-900">
+                  <Terminal className="w-4 h-4 text-[#0071e3]" />
                   API Health Diagnostics
                 </CardTitle>
                 <CardDescription>
@@ -1602,43 +1588,43 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Button variant="outline" size="sm" onClick={testConnection} disabled={loading} className="gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#0071e3]" />
                   Run Diagnostics & Test Connection
                 </Button>
 
                 {healthData && (
-                  <div className="p-3.5 rounded-xl border border-border bg-muted/30 text-xs space-y-2">
-                    <div className="flex justify-between items-center border-b border-border/60 pb-2">
-                      <span className="font-semibold text-foreground">Active Provider:</span>
+                  <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 text-xs space-y-2">
+                    <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                      <span className="font-semibold text-slate-800">Active Provider:</span>
                       <Badge variant={healthData.mode === "sandbox" ? "success" : "destructive"}>
                         {healthData.mode?.toUpperCase() || "SANDBOX"}
                       </Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Status:</span>
-                      <span className={healthData.connected ? "text-emerald-400 font-semibold" : "text-amber-300"}>
+                      <span className="text-slate-500">Status:</span>
+                      <span className={healthData.connected ? "text-emerald-700 font-semibold" : "text-amber-700 font-medium"}>
                         {healthData.connected ? "Verified & Authenticated ✓" : "Safe Sandbox Active"}
                       </span>
                     </div>
                     {healthData.username && (
                       <div className="flex justify-between items-center font-mono">
-                        <span className="text-muted-foreground">Connected X Account:</span>
-                        <span className="text-foreground">@{healthData.username}</span>
+                        <span className="text-slate-500">Connected X Account:</span>
+                        <span className="text-slate-900 font-semibold">@{healthData.username}</span>
                       </div>
                     )}
                     {healthData.rate_limit_remaining !== undefined && (
                       <div className="flex justify-between items-center font-mono">
-                        <span className="text-muted-foreground">Token Bucket Available:</span>
-                        <span className="text-emerald-400">{healthData.rate_limit_remaining} / 15 slots</span>
+                        <span className="text-slate-500">Token Bucket Available:</span>
+                        <span className="text-emerald-700 font-semibold">{healthData.rate_limit_remaining} / 15 slots</span>
                       </div>
                     )}
                     {healthData.note && (
-                      <div className="p-2 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 mt-2">
+                      <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 mt-2">
                         💡 {healthData.note}
                       </div>
                     )}
                     {healthData.error && (
-                      <div className="p-2 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 mt-2">
+                      <div className="p-2.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 mt-2">
                         ⚠️ {healthData.error}
                       </div>
                     )}
@@ -1648,10 +1634,10 @@ export default function HomePage() {
             </Card>
 
             {/* X API Keys */}
-            <Card className="border-border bg-card">
+            <Card className="border-white/90 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-amber-400" />
+                <CardTitle className="text-base flex items-center gap-2 text-slate-900">
+                  <Zap className="w-4 h-4 text-amber-600" />
                   X (Twitter) API v2 Configuration
                 </CardTitle>
                 <CardDescription>
@@ -1664,7 +1650,7 @@ export default function HomePage() {
                   { key: "x_access_token", label: "User OAuth 2.0 Access Token", placeholder: "User context token for DM sending" },
                 ].map(({ key, label, placeholder }) => (
                   <div key={key}>
-                    <label className="text-xs font-semibold uppercase text-muted-foreground block mb-1">
+                    <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
                       {label}
                     </label>
                     <div className="flex gap-2">
@@ -1685,21 +1671,21 @@ export default function HomePage() {
             </Card>
 
             {/* LLM Provider */}
-            <Card className="border-border bg-card">
+            <Card className="border-white/90 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-blue-400" />
+                <CardTitle className="text-base flex items-center gap-2 text-slate-900">
+                  <Cpu className="w-4 h-4 text-[#0071e3]" />
                   LLM Intelligence Engine
                 </CardTitle>
                 <CardDescription>Choose the AI model used for evidence evaluation and DM drafting.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold uppercase text-muted-foreground block mb-1">
+                  <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
                     AI Provider
                   </label>
                   <select
-                    className="flex h-9 w-full rounded-lg border border-border bg-card px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="flex h-9 w-full rounded-xl border border-slate-200/90 bg-white px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
                     value={settingsValues.llm_provider || "gemini"}
                     onChange={(e) => {
                       setSettingsValues({ ...settingsValues, llm_provider: e.target.value });
@@ -1718,7 +1704,7 @@ export default function HomePage() {
                   { key: "anthropic_api_key", label: "Anthropic API Key", placeholder: "sk-ant-..." },
                 ].map(({ key, label, placeholder }) => (
                   <div key={key}>
-                    <label className="text-xs font-semibold uppercase text-muted-foreground block mb-1">
+                    <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
                       {label}
                     </label>
                     <div className="flex gap-2">
@@ -1741,13 +1727,13 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* ── Global Loading Overlay ─────────────────────────── */}
+      {/* ── Global Loading Overlay (Apple Liquid Glass) ───── */}
       {loading && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in">
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center">
-            <div className="h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-medium text-foreground">{loadingText}</span>
-            <span className="text-[11px] text-muted-foreground">Running idempotent FDE pipeline...</span>
+        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in">
+          <div className="bg-white/95 border border-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center ring-1 ring-black/[0.04]">
+            <div className="h-8 w-8 border-3 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-semibold text-slate-900">{loadingText}</span>
+            <span className="text-[11px] text-slate-500 font-medium">Running idempotent FDE pipeline...</span>
           </div>
         </div>
       )}
