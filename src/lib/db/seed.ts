@@ -12,10 +12,14 @@ import seedProfiles from "../../data/seed-profiles.json";
 async function seed() {
   console.log("🌱 Seeding database for GenAI Fund Outreach Console...\n");
 
+  // Clean up existing data first for 100% idempotent reset
+  await db.delete(prospects).run();
+  await db.delete(campaigns).run();
+
   const campaignId = crypto.randomUUID();
 
   // 1. Create flagship GenAI Fund campaign
-  db.insert(campaigns)
+  await db.insert(campaigns)
     .values({
       id: campaignId,
       name: "SEA AI & Robotics Builders 2026",
@@ -104,7 +108,7 @@ async function seed() {
       ];
     }
 
-    db.insert(prospects)
+    await db.insert(prospects)
       .values({
         id: crypto.randomUUID(),
         campaignId,

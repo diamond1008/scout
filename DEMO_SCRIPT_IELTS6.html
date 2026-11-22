@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Scout — Kịch Bản Demo (Chuẩn 100% Giao Diện Thực Tế)</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 24px;
+      background: #f8fafc;
+    }
+    .container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+    h1 {
+      color: #0f172a;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .meta-box {
+      background: #f1f5f9;
+      border-left: 4px solid #0071e3;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    h2 {
+      font-size: 17px;
+      color: #0071e3;
+      margin-top: 32px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 28px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 12px 14px;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+    }
+    .voice-label {
+      color: #b45309;
+      font-weight: 700;
+      background: #fefce8;
+      width: 25%;
+    }
+    .voice-text {
+      color: #0f172a;
+      font-weight: 600;
+      background: #fefce8;
+      font-size: 14.5px;
+    }
+    .action-label {
+      color: #1d4ed8;
+      font-weight: 600;
+      width: 25%;
+    }
+    .action-text {
+      color: #334155;
+    }
+    .screen-label {
+      color: #047857;
+      font-weight: 600;
+      width: 25%;
+    }
+    .screen-text {
+      color: #065f46;
+      background: #ecfdf5;
+    }
+    .btn-gdoc {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: #0071e3;
+      color: white;
+      text-decoration: none;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 30px;
+      box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-gdoc:hover {
+      background: #005bb5;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+<a href="https://docs.google.com/document/d/1vnmmbM5cjYFGPZe2Q3hGkC1-ITLpr7Rh8-tSspDuGgY/edit" target="_blank" class="btn-gdoc">
+  📄 Mở Bản Google Docs Trực Tuyến
+</a>
+
+<div class="container" id="doc-content">
+  <h1>🎬 SCOUT — KỊCH BẢN QUAY DEMO (CHUẨN 100% GIAO DIỆN THỰC TẾ)</h1>
+  <div class="badge">Staff Forward Deployed Engineer Assignment — GenAI Fund</div>
+
+  <div class="meta-box">
+    <strong>🎯 Ban giám khảo:</strong> GenAI Fund Hiring Team (hr@genaifund.ai)<br>
+    <strong>⏱️ Thời lượng video:</strong> 3:30 – 3:45 phút<br>
+    <strong>🖥️ Local Console:</strong> <a href="http://localhost:3005" target="_blank">http://localhost:3005</a><br>
+    <strong>💡 Luồng thao tác:</strong> Duyệt thư (Approve) ➔ Nút chuyển thành Safely Send 1 Approved DMs ➔ Bấm Send ➔ Tự động sang Tracker xem 0 duplicates ➔ Bấm Sync Inbound Replies xem tin trả lời!
+  </div>
+
+  <h2>⏱️ PHẦN 1: MỞ ĐẦU & ĐẶT VẤN ĐỀ (0:00 – 0:30)</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>1.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Hi GenAI Fund team, my name is <strong>[Tên của bạn]</strong>, and this is <strong>Scout</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Để con trỏ chuột ở giữa màn hình, lắc nhẹ chuột tự nhiên, chưa cần click gì.</td>
+    </tr>
+    <tr>
+      <td><strong>1.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"When we reach out to AI and robotics founders in Southeast Asia, our fund's reputation is very important."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ nhẹ vào logo Scout ở góc trên cùng bên trái.</td>
+    </tr>
+    <tr>
+      <td><strong>1.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"There are two big problems we must avoid: <strong>never message the same founder twice</strong>, and <strong>never send fake or generic AI messages</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào card chiến dịch <em>"SEA AI & Robotics Builders 2026"</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>1.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"I built Scout to solve both problems completely."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Đưa chuột lên thanh điều hướng trên đỉnh, chuẩn bị click tab tiếp theo.</td>
+    </tr>
+  </table>
+
+  <h2>⏱️ PHẦN 2: CHIẾN DỊCH & BỘ DỮ LIỆU DISCOVERY (0:30 – 1:15)</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>2.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"First, let's open our campaign for AI and Robotics builders in Southeast Asia."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> chuột vào tab <strong>Discovery & Fit (26)</strong> trên thanh menu đỉnh.</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Màn hình tải ra danh sách các founder và thanh thống kê số liệu ở trên.</td>
+    </tr>
+    <tr>
+      <td><strong>2.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"In Sandbox mode, Scout loads <strong>30 real builder profiles</strong> from Singapore, Vietnam, Indonesia, and across the region."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột lướt qua các nút lọc quốc gia: <strong>SG</strong>, <strong>VN</strong>, <strong>ID</strong>, <strong>TH</strong>...</td>
+    </tr>
+    <tr>
+      <td><strong>2.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"As you can see, every profile shows full real data: real bios, recent tweets, follower counts, and locations."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Cuộn chuột (scroll) nhẹ xuống 1 nấc cho thấy các card profile rồi cuộn ngược lại lên trên.</td>
+    </tr>
+    <tr>
+      <td><strong>2.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"This allows you to test the whole workflow easily with <strong>zero API cost</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Chuẩn bị chuyển sang tab Review Queue.</td>
+    </tr>
+  </table>
+
+  <h2>⏱️ PHẦN 3: AI CHẤM ĐIỂM DỰA TRÊN DẪN CHỨNG THẬT (1:15 – 2:00) ⭐️</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>3.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Now, let's go to the <strong>Review Queue</strong> to see how Scout qualifies candidates with real evidence."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào tab <strong>Review Queue (2)</strong> trên thanh menu đỉnh.</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Hiện ra màn hình chia đôi 2 cột (Cột trái: Hồ sơ Jane Chen / Cột phải: Khung soạn thảo tin nhắn).</td>
+    </tr>
+    <tr>
+      <td><strong>3.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"When scoring each founder, Scout does not give a random score."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột sang cột trái, chỉ vào huy hiệu <strong>94% High Fit</strong>.</td>
+    </tr>
+    <tr>
+      <td><strong>3.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"It cites <strong>exact quotes</strong> from their tweets or bio."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào mục màu vàng <strong>GROUNDED EVIDENCE SOURCES</strong>.</td>
+    </tr>
+    <tr>
+      <td><strong>3.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"For example, Jane Chen has a 94% fit score because her tweet proves she built a robot with a 94% grasping success rate."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột gạch dưới dòng quote <em>"Just shipped v2 of our grasping policy — 94% success rate..."</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>3.5</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"And our automated guardrail verification checks the message to make sure it cites real evidence, with zero recruiter cliches."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào khung xanh lá <strong>AUTOMATED FDE GUARDRAIL VERIFICATION</strong> ở dưới ô tin nhắn.</td>
+    </tr>
+  </table>
+
+  <h2>⏱️ PHẦN 4: HÀNG ĐỢI DUYỆT HUMAN-IN-THE-LOOP (2:00 – 2:30)</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>4.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"On the right, we see the personalized message drafted by AI."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột sang ô văn bản ở cột bên phải.</td>
+    </tr>
+    <tr>
+      <td><strong>4.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"I can easily edit the message directly right here—for example, adding a personal note..."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click chuột vào cuối đoạn tin nhắn</strong> (sau dấu ?), gõ thêm: <em>" Excited to chat!"</em> (thấy số ký tự nhảy từ 241 lên 258).</td>
+    </tr>
+    <tr>
+      <td><strong>4.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"...and click Approve."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào nút màu xanh dương <strong>✓ Approve & Queue [A]</strong> ở góc dưới bên phải.</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Jane Chen được duyệt xong, nút xanh ở góc trên đỉnh đổi thành <strong>Safely Send 1 Approved DMs</strong>!</td>
+    </tr>
+    <tr>
+      <td><strong>4.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"No message is ever sent without explicit human approval."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Đưa chuột lên nút màu xanh lá <strong>Safely Send 1 Approved DMs</strong> ở góc trên bên phải.</td>
+    </tr>
+  </table>
+
+  <h2>⏱️ PHẦN 5: GỬI AN TOÀN & CHỐNG GỬI TRÙNG TUYỆT ĐỐI (2:30 – 3:15) ⭐️⭐️</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>5.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Now, let's safely send our approved message."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào nút màu xanh lá <strong>Safely Send 1 Approved DMs</strong> ở góc trên bên phải.</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Toast hiện <em>"Successfully sent 1 / 1 DMs (Zero duplicates) ✓"</em> và <strong>tự động chuyển sang tab Outreach & Inbox</strong>!</td>
+    </tr>
+    <tr>
+      <td><strong>5.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"The system automatically moves us to the Outreach Tracker. Notice the top stat: <strong>1 sent, with 0 duplicates</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào ô thống kê <strong>OUTREACH SENT: 1 (0 duplicates)</strong> ở hàng trên cùng.</td>
+    </tr>
+    <tr>
+      <td><strong>5.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Under the hood, our database uses an atomic lock and a unique constraint on Twitter IDs, so it is physically impossible to message the same founder twice."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào dòng của <strong>Jane Chen</strong> có nhãn xanh <strong>Sent (Sandbox)</strong>.</td>
+    </tr>
+    <tr>
+      <td><strong>5.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"We can also simulate incoming founder responses. Let's click <strong>'Sync Inbound Replies'</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào nút <strong>Sync Inbound Replies</strong> ở góc trên bên phải!</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Jane Chen đổi sang nhãn tím <strong>Replied 🔔</strong>!</td>
+    </tr>
+    <tr>
+      <td><strong>5.5</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"And look—Jane Chen has replied! We can see the complete conversation thread right here."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào dòng Jane Chen, nhìn sang khung chat bên phải thấy cuộc hội thoại 2 chiều!</td>
+    </tr>
+  </table>
+
+  <h2>⏱️ PHẦN 6: CÀI ĐẶT, API RATE LIMITS & KẾT THÚC (3:15 – 3:45)</h2>
+  <table>
+    <tr>
+      <th style="width: 8%;">Bước</th>
+      <th style="width: 28%;">Loại hành động</th>
+      <th>Chi tiết thao tác & Lời thoại</th>
+    </tr>
+    <tr>
+      <td><strong>6.1</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Finally, let's check <strong>Settings and Health</strong>."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text"><strong>Click</strong> vào tab <strong>Settings</strong> trên thanh menu đỉnh.</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="screen-label">🖥️ [Màn hình hiện ra - VN]</td>
+      <td class="screen-text">Bảng cài đặt hiện ra: nút gạt Sandbox/Live, bảng trạng thái API Health (15/15 tokens).</td>
+    </tr>
+    <tr>
+      <td><strong>6.2</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"In Settings, evaluators can easily switch between free Sandbox mode and Live Twitter API mode using your own API keys."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào nút gạt <strong>Sandbox / Live Mode</strong>.</td>
+    </tr>
+    <tr>
+      <td><strong>6.3</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"We also have a built-in rate limiter to protect against Twitter rate limits."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Rê chuột chỉ vào bảng <strong>API Health</strong> (chỉ số 15/15 Token Bucket).</td>
+    </tr>
+    <tr>
+      <td><strong>6.4</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Scout is built with Next.js 15 and SQLite. It takes <strong>less than two minutes</strong> to run locally on any computer."</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Cuộn chuột nhẹ lên đầu trang để khoe tổng thể giao diện Liquid Glass.</td>
+    </tr>
+    <tr>
+      <td><strong>6.5</strong></td>
+      <td class="voice-label">🗣️ [Lời thoại Tiếng Anh]</td>
+      <td class="voice-text">"Thank you very much for your time, and I look forward to hearing from you!"</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="action-label">🖱️ [Thao tác chuột - VN]</td>
+      <td class="action-text">Dừng con trỏ chuột ở giữa màn hình, mỉm cười nhẹ và bấm dừng quay video (Stop Recording).</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>

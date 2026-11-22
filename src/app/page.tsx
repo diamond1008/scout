@@ -69,6 +69,7 @@ interface Prospect {
 type View = "campaigns" | "discovery" | "review" | "tracker" | "settings";
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<View>("campaigns");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
@@ -125,6 +126,10 @@ export default function HomePage() {
     } catch (e) {
       console.error(e);
     }
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -496,6 +501,22 @@ export default function HomePage() {
       </span>
     );
   };
+
+  if (!mounted) {
+    return (
+      <div
+        suppressHydrationWarning
+        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-sky-50/25 to-indigo-50/20"
+      >
+        <div suppressHydrationWarning className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-500 font-medium tracking-wide">
+            Loading Scout Console...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-slate-900 flex flex-col font-sans" suppressHydrationWarning>
