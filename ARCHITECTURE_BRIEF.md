@@ -53,7 +53,7 @@ Venture capital outreach to technical founders requires **zero tolerance for spa
 ### Provider Adapter Pattern
 All external dependencies (X Twitter API and LLMs) implement unified TypeScript contracts (`IXProvider`, `ILLMProvider`):
 - **X Provider:** Switches cleanly between `SandboxXProvider` (backed by a curated 30-profile SEA dataset with simulated network conditions) and `LiveXProvider` (calling official X API v2 with token-bucket throttling).
-- **LLM Provider:** Supports Google Gemini (`gemini-2.0-flash`), OpenAI (`gpt-4o-mini`), and Anthropic (`claude-sonnet-4`) via the Vercel AI SDK with structured JSON schemas.
+- **LLM Provider:** Supports Google Gemini (`gemini-3.5-flash-lite` with automatic fallback to `gemini-flash-lite-latest` / `gemini-3-flash-preview`), OpenAI (`gpt-4o-mini`), and Anthropic (`claude-sonnet-4`) via the Vercel AI SDK with structured JSON schemas.
 
 ---
 
@@ -105,7 +105,7 @@ X API operates on a **consumption-based (pay-per-use)** model rather than the le
 | DM Send | `POST /2/dm_conversations/...` | \$0.015 / request | 25 approved DMs | \$0.38 |
 | DM Event Polling | `GET /2/dm_events` | \$0.010 / event | 100 events | \$1.00 |
 | **Total X API Cost** | | | | **~\$5.63** |
-| **LLM Inference** | Gemini 2.0 Flash | \$0.10 / 1M tokens | ~150k tokens | **~\$0.02** |
+| **LLM Inference** | Gemini 3.5 Flash-Lite | \$0.10 / 1M tokens | ~150k tokens | **~\$0.02** |
 | **Total Cost / Run** | | | | **~\$5.65** |
 
 *Note: In **Sandbox Mode**, total X API cost is strictly **$0.00**.*

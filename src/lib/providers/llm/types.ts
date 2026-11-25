@@ -42,6 +42,7 @@ export interface ILLMProvider {
     profile: UserProfile,
     fitResult: FitScoreResult,
     segment: SegmentContext,
-    sender: SenderContext
+    sender: SenderContext,
+    feedbackErrors?: string[]
   ): Promise<DraftResult>;
 }

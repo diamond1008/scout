@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { campaigns } from "@/lib/db/schema";
+import { campaigns, prospects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getLiveXStatus, getSettingsMap } from "@/lib/db/settings-helper";
 
@@ -78,6 +78,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
+  await db.delete(prospects).where(eq(prospects.campaignId, id)).run();
   await db.delete(campaigns).where(eq(campaigns.id, id)).run();
   return NextResponse.json({ success: true });
 }

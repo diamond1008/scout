@@ -90,7 +90,8 @@ export async function POST(req: NextRequest) {
     openai: settingsMap.openai_api_key || process.env.OPENAI_API_KEY,
     anthropic: settingsMap.anthropic_api_key || process.env.ANTHROPIC_API_KEY,
   };
-  const apiKey = keyMap[llmProvider] || "";
+  const rawKey = keyMap[llmProvider] || "";
+  const apiKey = rawKey.trim().replace(/^['"]+|['"]+$/g, "");
 
   // Use configured live provider or fallback to zero-config Sandbox engine
   const llm = createLLMProvider(llmProvider, apiKey);

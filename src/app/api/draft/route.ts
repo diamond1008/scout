@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
     openai: settingsMap.openai_api_key || process.env.OPENAI_API_KEY,
     anthropic: settingsMap.anthropic_api_key || process.env.ANTHROPIC_API_KEY,
   };
-  const apiKey = keyMap[llmProvider] || "";
+  const rawKey = keyMap[llmProvider] || "";
+  const apiKey = rawKey.trim().replace(/^['"]+|['"]+$/g, "");
 
   // Use configured live provider or fallback to zero-config Sandbox engine
   const llm = createLLMProvider(llmProvider, apiKey);
@@ -147,9 +148,9 @@ export async function POST(req: NextRequest) {
       const validation = validateDraft(draftResult, profile);
 
       if (!validation.valid) {
-        // One retry with feedback
+        // One retry with targeted guardrail feedback
         try {
-          draftResult = await llm.draftDM(profile, fitResult, segment, senderCtx);
+          draftResult = await llm.draftDM(profile, fitResult, segment, senderCtx, validation.errors);
           const retryValidation = validateDraft(draftResult, profile);
           if (!retryValidation.valid) {
             // Store the draft anyway but flag it

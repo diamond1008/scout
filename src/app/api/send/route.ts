@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, getRawDb } from "@/lib/db";
-import { prospects, campaigns, settings, auditLog } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { prospects, campaigns, auditLog } from "@/lib/db/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { SandboxXProvider } from "@/lib/providers/x/sandbox";
 import { LiveXProvider } from "@/lib/providers/x/live";
 import type { IXProvider } from "@/lib/providers/x/types";
+import { getLiveXStatus, getSettingsMap } from "@/lib/db/settings-helper";
 
 export async function POST(req: NextRequest) {
   const db = getDb();
@@ -32,38 +33,43 @@ export async function POST(req: NextRequest) {
   if (campaign.mode === "sandbox") {
     provider = new SandboxXProvider();
   } else {
-    const allSettings = await db.select().from(settings).all();
-    const settingsMap = Object.fromEntries((allSettings as any[]).map((s) => [s.key, s.value]));
-    if (!settingsMap.x_access_token) {
+    const settingsMap = await getSettingsMap();
+    const xGate = getLiveXStatus(settingsMap);
+    if (!xGate.liveVerified) {
       return NextResponse.json(
-        { error: "X API Access Token not configured. Go to Settings." },
+        { error: xGate.gateReason || "Live X API mode is locked until verified in Settings." },
         { status: 400 }
       );
     }
     provider = new LiveXProvider({
-      bearerToken: settingsMap.x_bearer_token || settingsMap.x_access_token,
+      bearerToken: settingsMap.x_bearer_token,
       accessToken: settingsMap.x_access_token,
     });
   }
 
-  // Get all APPROVED prospects for this campaign
+  // Get all APPROVED (or FAILED_RETRYABLE) prospects for this campaign
   const approved = await db
     .select()
     .from(prospects)
-    .where(and(eq(prospects.campaignId, campaignId), eq(prospects.status, "APPROVED")))
+    .where(
+      and(
+        eq(prospects.campaignId, campaignId),
+        inArray(prospects.status, ["APPROVED", "FAILED_RETRYABLE"])
+      )
+    )
     .all();
 
   const results: { id: string; username: string; status: string; error?: string }[] = [];
 
   for (const prospect of approved) {
     // ★ ATOMIC STATUS TRANSITION with optimistic locking ★
-    // Only pick up if still APPROVED and not locked
+    // Only pick up if still APPROVED / FAILED_RETRYABLE and not locked
     const nowIso = new Date().toISOString();
     const lockUntilIso = new Date(Date.now() + 30_000).toISOString();
     const lockResult = await raw.execute({
       sql: `UPDATE prospects
             SET status = 'SENDING', locked_until = ?, updated_at = ?, send_attempts = send_attempts + 1
-            WHERE id = ? AND status = 'APPROVED' AND (locked_until IS NULL OR locked_until < ?)`,
+            WHERE id = ? AND status IN ('APPROVED', 'FAILED_RETRYABLE') AND (locked_until IS NULL OR locked_until < ?)`,
       args: [lockUntilIso, nowIso, prospect.id, nowIso],
     });
 

@@ -40,7 +40,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await upsertSetting(key, value);
+  const isSecretOrToken = key.includes("key") || key.includes("token") || key.includes("secret");
+  const normalizedValue =
+    typeof value === "string"
+      ? isSecretOrToken
+        ? value.trim().replace(/^['"]+|['"]+$/g, "")
+        : value.trim()
+      : value;
+
+  await upsertSetting(key, normalizedValue);
 
   // Any edit to X credentials invalidates prior Live verification until re-tested
   if (X_TOKEN_KEYS.has(key)) {

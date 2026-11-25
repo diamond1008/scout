@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { prospects, campaigns, settings } from "@/lib/db/schema";
+import { prospects, campaigns } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { LiveXProvider } from "@/lib/providers/x/live";
+import { getLiveXStatus, getSettingsMap } from "@/lib/db/settings-helper";
 
 const REALISTIC_SANDBOX_REPLIES = [
   "Hi! Thanks for reaching out. Yes, we're currently raising our pre-seed round — would love to find 15 mins next Tuesday to share what we're building.",
@@ -76,20 +77,18 @@ export async function POST(req: NextRequest) {
     }
   } else {
     // Live mode: Poll official X API v2 dm_events
-    const allSettings = await db.select().from(settings).all();
-    const settingsMap = Object.fromEntries(
-      (allSettings as any[]).map((s) => [s.key, s.value])
-    );
+    const settingsMap = await getSettingsMap();
+    const xGate = getLiveXStatus(settingsMap);
 
-    if (!settingsMap.x_access_token) {
+    if (!xGate.liveVerified) {
       return NextResponse.json(
-        { error: "X API Access Token not configured for Live mode" },
+        { error: xGate.gateReason || "Live X API mode is locked until verified in Settings." },
         { status: 400 }
       );
     }
 
     const liveProvider = new LiveXProvider({
-      bearerToken: settingsMap.x_bearer_token || settingsMap.x_access_token,
+      bearerToken: settingsMap.x_bearer_token,
       accessToken: settingsMap.x_access_token,
     });
 

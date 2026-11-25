@@ -105,6 +105,7 @@ const COUNTRY_FILTER_OPTIONS = [
   { value: "ID", label: "🇮🇩 Indonesia" },
   { value: "TH", label: "🇹🇭 Thailand" },
   { value: "MY", label: "🇲🇾 Malaysia" },
+  { value: "PH", label: "🇵🇭 Philippines" },
 ] as const;
 
 const SCORE_FILTER_OPTIONS = [
@@ -534,7 +535,7 @@ export default function HomePage() {
 
   const sendApproved = async () => {
     if (!selectedCampaign) return;
-    const approvedCount = prospects.filter((p) => p.status === "APPROVED").length;
+    const approvedCount = prospects.filter((p) => ["APPROVED", "FAILED_RETRYABLE"].includes(p.status)).length;
     if (approvedCount === 0) {
       showMsg("No approved DMs in queue");
       return;
@@ -616,7 +617,7 @@ export default function HomePage() {
     const scored = prospects.filter((p) => p.status === "SCORED").length;
     const highFit = prospects.filter((p) => (p.fitScore || 0) >= 0.7).length;
     const drafted = prospects.filter((p) => p.status === "DRAFTED").length;
-    const approved = prospects.filter((p) => p.status === "APPROVED").length;
+    const approved = prospects.filter((p) => ["APPROVED", "FAILED_RETRYABLE"].includes(p.status)).length;
     const sent = prospects.filter((p) => ["SENT", "SENT_SANDBOX"].includes(p.status)).length;
     const replied = prospects.filter((p) => p.status === "REPLIED").length;
     const blocked = prospects.filter((p) => p.status === "BLOCKED_DM_CLOSED").length;
@@ -657,14 +658,38 @@ export default function HomePage() {
       };
     }
     const lower = activeDraftText.toLowerCase();
-    const banned = ["pick your brain", "stumbled upon", "thought leader", "synergy", "touch base", "circle back"];
-    const fam = [/we met at/i, /great meeting you/i, /as we discussed/i, /following up on our/i];
+    const banned = [
+      "pick your brain",
+      "stumbled upon",
+      "came across your amazing",
+      "thought leader",
+      "synergy",
+      "circle back",
+      "low-hanging fruit",
+      "touch base",
+      "deep dive into",
+      "leverage your expertise",
+      "paradigm shift",
+      "move the needle",
+      "i'm a huge fan",
+      "i've been following your work",
+    ];
+    const fam = [
+      /we met at/i,
+      /great meeting you/i,
+      /as we discussed/i,
+      /as per our conversation/i,
+      /following up on our/i,
+      /nice to meet you at/i,
+      /remember when we/i,
+    ];
     const hasEvidence =
-      (currentReview.evidenceSources && currentReview.evidenceSources.length > 0) ||
-      activeDraftText.trim().length > 20;
+      Boolean(currentReview.evidenceSources && currentReview.evidenceSources.length > 0) &&
+      activeDraftText.trim().length > 20 &&
+      lower.includes("genai");
     const noCliches = !banned.some((b) => lower.includes(b));
     const noFamiliarity = !fam.some((rx) => rx.test(activeDraftText));
-    const withinLimit = activeDraftText.length > 0 && activeDraftText.length <= 500;
+    const withinLimit = activeDraftText.trim().length > 0 && activeDraftText.length <= 500;
     const needsReviewFlag = activeDraftText.startsWith("[NEEDS REVIEW]");
     return { hasEvidence, noFamiliarity, noCliches, withinLimit, needsReviewFlag };
   }, [currentReview, activeDraftText]);
@@ -681,10 +706,11 @@ export default function HomePage() {
       const matchesCountry =
         countryFilter === "ALL" ||
         (countryFilter === "SG" && (p.xLocation?.includes("Singapore") || p.xLocation?.includes("SG"))) ||
-        (countryFilter === "VN" && (p.xLocation?.includes("Vietnam") || p.xLocation?.includes("VN") || p.xLocation?.includes("Hanoi") || p.xLocation?.includes("Saigon"))) ||
+        (countryFilter === "VN" && (p.xLocation?.includes("Vietnam") || p.xLocation?.includes("VN") || p.xLocation?.includes("Hanoi") || p.xLocation?.includes("Saigon") || p.xLocation?.includes("Ho Chi Minh"))) ||
         (countryFilter === "ID" && (p.xLocation?.includes("Indonesia") || p.xLocation?.includes("Jakarta") || p.xLocation?.includes("Bandung"))) ||
         (countryFilter === "TH" && (p.xLocation?.includes("Thailand") || p.xLocation?.includes("Bangkok"))) ||
-        (countryFilter === "MY" && (p.xLocation?.includes("Malaysia") || p.xLocation?.includes("Kuala Lumpur")));
+        (countryFilter === "MY" && (p.xLocation?.includes("Malaysia") || p.xLocation?.includes("Kuala Lumpur"))) ||
+        (countryFilter === "PH" && (p.xLocation?.includes("Philippines") || p.xLocation?.includes("Manila") || p.xLocation?.includes("BGC") || p.xLocation?.includes("PH")));
 
       const matchesScore = minScoreFilter === 0 || (p.fitScore || 0) >= minScoreFilter;
 
@@ -771,7 +797,7 @@ export default function HomePage() {
 
       {/* ── Apple Liquid Glass Top Navigation ────────────── */}
       <header className="border-b border-white/60 bg-white/70 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 xl:py-0 xl:h-16 flex flex-wrap xl:flex-nowrap items-center justify-between gap-x-4 gap-y-2.5">
           {/* Brand Identity - No background on icon */}
           <div className="flex items-center gap-2.5 shrink-0">
             <Compass className="h-7 w-7 text-[#0071e3] shrink-0 stroke-[2.2]" />
@@ -786,41 +812,43 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Segmented Pill Navigation - whitespace-nowrap & clean badges */}
-          <nav className="flex items-center gap-1 bg-slate-200/50 backdrop-blur-xl p-1 rounded-2xl border border-white/80 shadow-inner shrink-0 flex-nowrap">
-            {[
-              { id: "campaigns", label: "Campaigns", icon: Layers },
-              { id: "discovery", label: "Discovery & Fit", icon: Compass, count: stats.discovered },
-              { id: "review", label: "Review Queue", icon: CheckCircle2, count: stats.drafted },
-              { id: "tracker", label: "Outreach & Inbox", icon: Inbox, count: stats.replied },
-              { id: "settings", label: "Settings", icon: SettingsIcon },
-            ].map(({ id, label, icon: Icon, count }) => (
-              <button
-                key={id}
-                onClick={() => setView(id as View)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap shrink-0 transition-all ${
-                  view === id
-                    ? "bg-white/95 text-slate-900 shadow-sm shadow-slate-900/5 font-semibold"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                <span className="whitespace-nowrap">{label}</span>
-                {count !== undefined && count > 0 && (
-                  <span className="ml-1 text-[11px] font-semibold text-slate-400 whitespace-nowrap">
-                    ({count})
-                  </span>
-                )}
-              </button>
-            ))}
+          {/* Segmented Pill Navigation - wraps cleanly below xl, scrollable on narrow viewports */}
+          <nav className="order-3 xl:order-2 w-full xl:w-auto flex items-center overflow-x-auto max-w-full">
+            <div className="flex items-center gap-1 bg-slate-200/50 backdrop-blur-xl p-1 rounded-2xl border border-white/80 shadow-inner mx-auto flex-nowrap">
+              {[
+                { id: "campaigns", label: "Campaigns", icon: Layers },
+                { id: "discovery", label: "Discovery & Fit", icon: Compass, count: stats.discovered },
+                { id: "review", label: "Review Queue", icon: CheckCircle2, count: stats.drafted },
+                { id: "tracker", label: "Outreach & Inbox", icon: Inbox, count: stats.replied },
+                { id: "settings", label: "Settings", icon: SettingsIcon },
+              ].map(({ id, label, icon: Icon, count }) => (
+                <button
+                  key={id}
+                  onClick={() => setView(id as View)}
+                  className={`flex items-center gap-1.5 px-3 xl:px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap shrink-0 transition-all ${
+                    view === id
+                      ? "bg-white/95 text-slate-900 shadow-sm shadow-slate-900/5 font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+                  <span className="whitespace-nowrap">{label}</span>
+                  {count !== undefined && count > 0 && (
+                    <span className="ml-1 text-[11px] font-semibold text-slate-400 whitespace-nowrap">
+                      ({count})
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </nav>
 
           {/* Active Campaign / Mode Indicator */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="order-2 xl:order-3 flex items-center gap-3 shrink-0">
             {selectedCampaign && (
-              <div className="hidden lg:flex items-center gap-2 border border-white/80 rounded-2xl px-3 py-1.5 bg-white/70 backdrop-blur-md shadow-2xs text-xs whitespace-nowrap shrink-0">
-                <span className="text-slate-500 whitespace-nowrap">Radar:</span>
-                <span className="font-semibold text-slate-900 truncate max-w-[130px] whitespace-nowrap">
+              <div className="flex items-center gap-2 border border-white/80 rounded-2xl px-2.5 sm:px-3 py-1.5 bg-white/70 backdrop-blur-md shadow-2xs text-xs whitespace-nowrap shrink-0">
+                <span className="hidden sm:inline text-slate-500 whitespace-nowrap">Radar:</span>
+                <span className="hidden sm:inline font-semibold text-slate-900 truncate max-w-[110px] xl:max-w-[130px] whitespace-nowrap">
                   {selectedCampaign.name}
                 </span>
                 <button

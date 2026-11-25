@@ -4,7 +4,7 @@ import { prospects, campaigns } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { SandboxXProvider } from "@/lib/providers/x/sandbox";
 import { LiveXProvider } from "@/lib/providers/x/live";
-import { settings } from "@/lib/db/schema";
+import { getLiveXStatus, getSettingsMap } from "@/lib/db/settings-helper";
 
 export async function POST(req: NextRequest) {
   const db = getDb();
@@ -31,20 +31,18 @@ export async function POST(req: NextRequest) {
   if (campaign.mode === "sandbox") {
     provider = new SandboxXProvider();
   } else {
-    // Get API keys from settings
-    const allSettings = await db.select().from(settings).all();
-    const settingsMap = Object.fromEntries((allSettings as any[]).map((s) => [s.key, s.value]));
-
-    if (!settingsMap.x_bearer_token) {
+    const settingsMap = await getSettingsMap();
+    const xGate = getLiveXStatus(settingsMap);
+    if (!xGate.liveVerified) {
       return NextResponse.json(
-        { error: "X API Bearer Token not configured. Go to Settings." },
+        { error: xGate.gateReason || "Live X API mode is locked until verified in Settings." },
         { status: 400 }
       );
     }
 
     provider = new LiveXProvider({
       bearerToken: settingsMap.x_bearer_token,
-      accessToken: settingsMap.x_access_token || settingsMap.x_bearer_token,
+      accessToken: settingsMap.x_access_token,
     });
   }
 

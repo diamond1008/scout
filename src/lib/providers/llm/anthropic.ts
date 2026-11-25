@@ -52,7 +52,8 @@ export class AnthropicProvider implements ILLMProvider {
     profile: UserProfile,
     fitResult: FitScoreResult,
     segment: SegmentContext,
-    sender: SenderContext
+    sender: SenderContext,
+    feedbackErrors?: string[]
   ): Promise<DraftResult> {
     const { object } = await generateObject({
       model: this.model,
@@ -76,6 +77,13 @@ export class AnthropicProvider implements ILLMProvider {
           fit_reasoning: fitResult.fit_reasoning,
           evidence_sources: fitResult.evidence_sources,
         },
+        ...(feedbackErrors?.length
+          ? {
+              guardrail_feedback_to_fix: feedbackErrors,
+              instruction:
+                "Your previous draft failed post-generation guardrails. Rewrite the DM fixing every issue listed in guardrail_feedback_to_fix while citing verbatim evidence and mentioning GenAI Fund.",
+            }
+          : {}),
       }),
     });
     return object;

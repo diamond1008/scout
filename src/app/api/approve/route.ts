@@ -49,14 +49,17 @@ export async function POST(req: NextRequest) {
         break;
       }
       case "edit": {
-        if (!editedMessage) {
-          return NextResponse.json({ error: "Missing editedMessage" }, { status: 400 });
+        if (!editedMessage || !editedMessage.trim()) {
+          return NextResponse.json({ error: "Draft message cannot be empty" }, { status: 400 });
+        }
+        if (editedMessage.length > 500) {
+          return NextResponse.json({ error: `Draft exceeds 500 character limit (${editedMessage.length} chars)` }, { status: 400 });
         }
         // Edit stays in DRAFTED state
         await db
           .update(prospects)
           .set({
-            draftMessage: editedMessage,
+            draftMessage: editedMessage.trim(),
             draftEditedBy: "human",
             updatedAt: new Date().toISOString(),
           })
