@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { campaigns } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { getLiveXStatus, getSettingsMap } from "@/lib/db/settings-helper";
+
+async function checkLiveGateError(): Promise<string | null> {
+  const settingsMap = await getSettingsMap();
+  const status = getLiveXStatus(settingsMap);
+  return status.liveVerified ? null : status.gateReason;
+}
 
 export async function GET() {
   const db = getDb();
@@ -12,6 +19,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const db = getDb();
   const body = await req.json();
+  const targetMode = body.mode || "sandbox";
+
+  if (targetMode === "live") {
+    const gateError = await checkLiveGateError();
+    if (gateError) {
+      return NextResponse.json({ error: gateError }, { status: 400 });
+    }
+  }
 
   const newCampaign = await db
     .insert(campaigns)
@@ -20,7 +35,7 @@ export async function POST(req: NextRequest) {
       description: body.description || null,
       keywords: body.keywords || [],
       seedHandles: body.seedHandles || [],
-      mode: body.mode || "sandbox",
+      mode: targetMode,
       status: "active",
     })
     .returning()
@@ -38,6 +53,13 @@ export async function PATCH(req: NextRequest) {
   }
 
   const body = await req.json();
+  if (body.mode === "live") {
+    const gateError = await checkLiveGateError();
+    if (gateError) {
+      return NextResponse.json({ error: gateError }, { status: 400 });
+    }
+  }
+
   const updates: Record<string, any> = { updatedAt: new Date().toISOString() };
   if (body.mode) updates.mode = body.mode;
   if (body.status) updates.status = body.status;

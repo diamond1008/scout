@@ -11,7 +11,8 @@ const client = createClient({
 });
 
 // Initialize tables if they don't exist
-client.executeMultiple(`
+const initPragma = dbUrl.startsWith("file:") ? "PRAGMA busy_timeout = 5000;\n" : "";
+client.executeMultiple(`${initPragma}
   CREATE TABLE IF NOT EXISTS campaigns (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -84,7 +85,9 @@ client.executeMultiple(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `).catch((err) => {
-  console.error("Error creating tables:", err);
+  if (!String(err).includes("SQLITE_BUSY")) {
+    console.error("Error creating tables:", err);
+  }
 });
 
 export const db = drizzle(client, { schema });

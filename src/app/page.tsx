@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import {
   Compass,
   CheckCircle2,
@@ -18,7 +19,6 @@ import {
   X,
   ExternalLink,
   ShieldCheck,
-  Filter,
   MessageSquare,
   RefreshCw,
   Terminal,
@@ -33,7 +33,7 @@ import {
   TrendingUp,
   UserCheck,
   Layers,
-  ArrowRight
+  AlertTriangle
 } from "lucide-react";
 
 interface Campaign {
@@ -68,6 +68,51 @@ interface Prospect {
 
 type View = "campaigns" | "discovery" | "review" | "tracker" | "settings";
 
+const LLM_PROVIDER_CONFIGS = [
+  {
+    value: "gemini",
+    label: "Google Gemini 3.5 Flash-Lite (Recommended)",
+    description: "Fast multimodal reasoning & structured JSON scoring",
+    keyName: "google_api_key",
+    keyLabel: "Gemini API Key",
+    placeholder: "AIzaSy...",
+    helper: "Active for Google Gemini 3.5 Flash-Lite. Leave blank to keep Heuristic Sandbox ($0 fallback).",
+  },
+  {
+    value: "openai",
+    label: "OpenAI GPT-4o mini",
+    description: "Strict JSON schema scoring & concise outreach drafting",
+    keyName: "openai_api_key",
+    keyLabel: "OpenAI API Key",
+    placeholder: "sk-...",
+    helper: "Active for OpenAI GPT-4o mini. Leave blank to keep Heuristic Sandbox ($0 fallback).",
+  },
+  {
+    value: "anthropic",
+    label: "Anthropic Claude Sonnet 4",
+    description: "High-nuance personalized founder outreach & tone control",
+    keyName: "anthropic_api_key",
+    keyLabel: "Anthropic API Key",
+    placeholder: "sk-ant-...",
+    helper: "Active for Anthropic Claude Sonnet 4. Leave blank to keep Heuristic Sandbox ($0 fallback).",
+  },
+] as const;
+
+const COUNTRY_FILTER_OPTIONS = [
+  { value: "ALL", label: "All SEA Countries" },
+  { value: "SG", label: "🇸🇬 Singapore" },
+  { value: "VN", label: "🇻🇳 Vietnam" },
+  { value: "ID", label: "🇮🇩 Indonesia" },
+  { value: "TH", label: "🇹🇭 Thailand" },
+  { value: "MY", label: "🇲🇾 Malaysia" },
+] as const;
+
+const SCORE_FILTER_OPTIONS = [
+  { value: "0", label: "All Scores" },
+  { value: "0.7", label: "High Fit Only (≥ 70%)" },
+  { value: "0.4", label: "Relevant (≥ 40%)" },
+] as const;
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<View>("campaigns");
@@ -88,11 +133,13 @@ export default function HomePage() {
 
   // Settings & Health
   const [settingsValues, setSettingsValues] = useState<Record<string, string>>({});
+  const [savedSettingHints, setSavedSettingHints] = useState<Record<string, string>>({});
+  const [xLiveVerified, setXLiveVerified] = useState(false);
   const [healthData, setHealthData] = useState<any>(null);
 
   // Review state
   const [reviewIndex, setReviewIndex] = useState(0);
-  const [editingDraft, setEditingDraft] = useState("");
+  const [editingDraft, setEditingDraft] = useState<string | null>(null);
 
   // Discovery inspection modal
   const [inspectProspect, setInspectProspect] = useState<Prospect | null>(null);
@@ -104,6 +151,31 @@ export default function HomePage() {
 
   // Tracker selected thread
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (!res.ok) return;
+      const list = (await res.json()) as { key: string; value: string; hasValue: boolean }[];
+      const hints: Record<string, string> = {};
+      let providerValue = "gemini";
+      let verifiedFlag = false;
+      for (const item of list) {
+        if (item.key === "llm_provider" && item.value) {
+          providerValue = item.value;
+        } else if (item.key === "x_live_verified") {
+          verifiedFlag = item.value === "true";
+        } else if (item.hasValue) {
+          hints[item.key] = item.value;
+        }
+      }
+      setSavedSettingHints(hints);
+      setXLiveVerified(verifiedFlag);
+      setSettingsValues((prev) => ({ ...prev, llm_provider: prev.llm_provider || providerValue }));
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   const fetchCampaigns = useCallback(async () => {
     try {
@@ -134,7 +206,8 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchCampaigns();
-  }, [fetchCampaigns]);
+    fetchSettings();
+  }, [fetchCampaigns, fetchSettings]);
 
   useEffect(() => {
     if (selectedCampaign) {
@@ -144,38 +217,8 @@ export default function HomePage() {
 
   const showMsg = (msg: string) => {
     setMessage(msg);
-    setTimeout(() => setMessage(""), 4000);
+    setTimeout(() => setMessage(""), 4500);
   };
-
-  // ── Keyboard shortcuts for Review Queue ───────────────────
-  useEffect(() => {
-    if (view !== "review") return;
-    const drafted = prospects.filter((p) => p.status === "DRAFTED");
-    const current = drafted[reviewIndex];
-    if (!current) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (["TEXTAREA", "INPUT"].includes((e.target as HTMLElement).tagName)) {
-        return;
-      }
-      if (e.key === "a" || e.key === "A") {
-        e.preventDefault();
-        handleApproval(current.id, "approve");
-      } else if (e.key === "r" || e.key === "R") {
-        e.preventDefault();
-        handleApproval(current.id, "reject");
-      } else if (e.key === " " || e.key === "ArrowRight") {
-        e.preventDefault();
-        setReviewIndex((prev) => Math.min(prev + 1, drafted.length - 1));
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        setReviewIndex((prev) => Math.max(prev - 1, 0));
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [view, reviewIndex, prospects]);
 
   // ── Campaign actions ────────────────────────────────────
   const createCampaign = async () => {
@@ -194,6 +237,10 @@ export default function HomePage() {
         }),
       });
       const created = await res.json();
+      if (!res.ok) {
+        showMsg(created.error || "Failed to create campaign");
+        return;
+      }
       setNewName(""); setNewDesc(""); setNewKeywords(""); setNewSeeds(""); setNewMode("sandbox");
       setShowCreate(false);
       await fetchCampaigns();
@@ -209,12 +256,22 @@ export default function HomePage() {
   const toggleCampaignMode = async (c: Campaign, e: React.MouseEvent) => {
     e.stopPropagation();
     const targetMode = c.mode === "sandbox" ? "live" : "sandbox";
+    if (targetMode === "live" && !xLiveVerified) {
+      showMsg("Live X API is locked until both X tokens pass Test Connection in Settings.");
+      setView("settings");
+      return;
+    }
     try {
-      await fetch(`/api/campaigns?id=${c.id}`, {
+      const res = await fetch(`/api/campaigns?id=${c.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: targetMode }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        showMsg(errData.error || "Failed to switch campaign mode");
+        return;
+      }
       await fetchCampaigns();
       if (selectedCampaign?.id === c.id) {
         setSelectedCampaign({ ...selectedCampaign, mode: targetMode });
@@ -232,7 +289,15 @@ export default function HomePage() {
       const res = await fetch("/api/health");
       const data = await res.json();
       setHealthData(data);
-      showMsg(data.connected ? "Connection verified ✓" : `Status: ${data.error || "Sandbox Active"}`);
+      setXLiveVerified(Boolean(data.liveVerified));
+      await fetchSettings();
+      if (data.liveVerified) {
+        showMsg("X API verified ✓ Live mode unlocked");
+      } else if (data.mode === "sandbox") {
+        showMsg("Safe Sandbox Active ($0) ✓");
+      } else {
+        showMsg(data.error || "X API verification failed");
+      }
     } catch {
       showMsg("Failed to check health");
     } finally {
@@ -251,8 +316,14 @@ export default function HomePage() {
         body: JSON.stringify({ campaignId: selectedCampaign.id }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Discovery failed");
+        return;
+      }
       await fetchProspects(selectedCampaign.id);
-      showMsg(`Discovered ${data.added} new candidates (${data.skipped} skipped) ✓`);
+      const added = data.discovered ?? data.added ?? 0;
+      const skipped = data.skipped ?? 0;
+      showMsg(`Discovered ${added} new candidates (${skipped} skipped by UNIQUE lock) ✓`);
     } catch {
       showMsg("Discovery failed");
     } finally {
@@ -260,7 +331,7 @@ export default function HomePage() {
     }
   };
 
-  const runScoring = async () => {
+  const runScoring = async (prospectIds?: string[]) => {
     if (!selectedCampaign) return;
     setLoading(true);
     setLoadingText("Evaluating candidate fitness & extracting evidence...");
@@ -268,11 +339,18 @@ export default function HomePage() {
       const res = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ campaignId: selectedCampaign.id }),
+        body: JSON.stringify({
+          campaignId: selectedCampaign.id,
+          ...(prospectIds?.length ? { prospectIds } : {}),
+        }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Scoring failed");
+        return;
+      }
       await fetchProspects(selectedCampaign.id);
-      showMsg(`Qualified & scored ${data.scored} profiles ✓`);
+      showMsg(`Qualified & scored ${data.scored ?? 0} profiles ✓`);
     } catch {
       showMsg("Scoring failed");
     } finally {
@@ -280,7 +358,7 @@ export default function HomePage() {
     }
   };
 
-  const runDrafting = async (minScore: number = 0.4) => {
+  const runDrafting = async (minScore: number = 0.4, prospectIds?: string[]) => {
     if (!selectedCampaign) return;
     setLoading(true);
     setLoadingText("Drafting evidence-grounded DMs with guardrails...");
@@ -291,14 +369,22 @@ export default function HomePage() {
         body: JSON.stringify({
           campaignId: selectedCampaign.id,
           minScore,
+          ...(prospectIds?.length ? { prospectIds } : {}),
           sender: { fund_name: "GenAI Fund", sender_name: "GenAI Fund Team" },
         }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Drafting failed");
+        return;
+      }
       await fetchProspects(selectedCampaign.id);
-      showMsg(`Drafted ${data.drafted} personalized DMs for review ✓`);
-      setView("review");
-      setReviewIndex(0);
+      showMsg(`Drafted ${data.drafted ?? 0} personalized DMs for review ✓`);
+      if ((data.drafted ?? 0) > 0) {
+        setView("review");
+        setReviewIndex(0);
+        setEditingDraft(null);
+      }
     } catch {
       showMsg("Drafting failed");
     } finally {
@@ -306,28 +392,145 @@ export default function HomePage() {
     }
   };
 
-  const handleApproval = async (prospectId: string, action: "approve" | "reject", editedMessage?: string) => {
-    if (action === "approve" && editingDraft) {
-      await fetch("/api/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectId, action: "edit", editedMessage: editingDraft }),
-      });
-    }
-    await fetch("/api/approve", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prospectId, action }),
-    });
-    await fetchProspects(selectedCampaign!.id);
-    setEditingDraft("");
-    showMsg(action === "approve" ? "Approved & queued for safe send ✓" : "Candidate rejected ✗");
-    
-    const drafted = prospects.filter((p) => p.status === "DRAFTED");
-    if (reviewIndex >= drafted.length - 1) {
-      setReviewIndex(Math.max(0, drafted.length - 2));
+  const scoreAndDraftSingle = async (prospect: Prospect) => {
+    if (!selectedCampaign) return;
+    setLoading(true);
+    setLoadingText(`Preparing draft DM for @${prospect.xUsername}...`);
+    try {
+      let currentStatus = prospect.status;
+      if (currentStatus === "DISCOVERED") {
+        const sRes = await fetch("/api/score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ campaignId: selectedCampaign.id, prospectIds: [prospect.id] }),
+        });
+        const sData = await sRes.json();
+        if (!sRes.ok) {
+          showMsg(sData.error || "Scoring failed");
+          return;
+        }
+        const sItem = sData.results?.[0];
+        if (sItem?.status === "error") {
+          showMsg(sItem.error || "Scoring failed");
+          return;
+        }
+        currentStatus = "SCORED";
+      }
+
+      if (currentStatus === "SCORED") {
+        const dRes = await fetch("/api/draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            campaignId: selectedCampaign.id,
+            minScore: 0,
+            prospectIds: [prospect.id],
+            sender: { fund_name: "GenAI Fund", sender_name: "GenAI Fund Team" },
+          }),
+        });
+        const dData = await dRes.json();
+        if (!dRes.ok) {
+          showMsg(dData.error || "Drafting failed");
+          return;
+        }
+        const dItem = dData.results?.[0];
+        if (dItem?.status === "error") {
+          showMsg(dItem.errors?.[0] || "Drafting failed");
+          return;
+        }
+      }
+
+      const refreshedRes = await fetch(`/api/prospects?campaignId=${selectedCampaign.id}`);
+      const refreshed = (await refreshedRes.json()) as Prospect[];
+      setProspects(refreshed);
+      const draftedList = refreshed.filter((p) => p.status === "DRAFTED");
+      const targetIdx = draftedList.findIndex((p) => p.id === prospect.id);
+      if (targetIdx >= 0) {
+        setInspectProspect(null);
+        setReviewIndex(targetIdx);
+        setEditingDraft(null);
+        setView("review");
+        showMsg(`Draft ready for @${prospect.xUsername} ✓`);
+      } else {
+        const updatedSelf = refreshed.find((p) => p.id === prospect.id) || null;
+        setInspectProspect(updatedSelf);
+        showMsg(`Could not draft DM for @${prospect.xUsername} (status: ${updatedSelf?.status || "unknown"})`);
+      }
+    } catch {
+      showMsg("Failed to prepare draft");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleApproval = useCallback(
+    async (prospectId: string, action: "approve" | "reject") => {
+      if (!selectedCampaign) return;
+      try {
+        if (action === "approve" && editingDraft !== null) {
+          const editRes = await fetch("/api/approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prospectId, action: "edit", editedMessage: editingDraft }),
+          });
+          if (!editRes.ok) {
+            const err = await editRes.json();
+            showMsg(err.error || "Failed to save draft edit");
+            return;
+          }
+        }
+        const res = await fetch("/api/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prospectId, action }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          showMsg(err.error || "Approval action failed");
+          return;
+        }
+        await fetchProspects(selectedCampaign.id);
+        setEditingDraft(null);
+        showMsg(action === "approve" ? "Approved & queued for safe send ✓" : "Candidate rejected ✗");
+      } catch {
+        showMsg("Request failed");
+      }
+    },
+    [selectedCampaign, editingDraft, fetchProspects]
+  );
+
+  // ── Keyboard shortcuts for Review Queue ───────────────────
+  useEffect(() => {
+    if (view !== "review") return;
+    const drafted = prospects.filter((p) => p.status === "DRAFTED");
+    const safeIdx = Math.min(reviewIndex, Math.max(0, drafted.length - 1));
+    const current = drafted[safeIdx];
+    if (!current) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (["TEXTAREA", "INPUT", "SELECT"].includes((e.target as HTMLElement).tagName)) {
+        return;
+      }
+      if (e.key === "a" || e.key === "A") {
+        e.preventDefault();
+        handleApproval(current.id, "approve");
+      } else if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        handleApproval(current.id, "reject");
+      } else if (e.key === " " || e.key === "ArrowRight") {
+        e.preventDefault();
+        setEditingDraft(null);
+        setReviewIndex((prev) => Math.min(prev + 1, Math.max(0, drafted.length - 1)));
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setEditingDraft(null);
+        setReviewIndex((prev) => Math.max(prev - 1, 0));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [view, reviewIndex, prospects, handleApproval]);
 
   const sendApproved = async () => {
     if (!selectedCampaign) return;
@@ -345,9 +548,18 @@ export default function HomePage() {
         body: JSON.stringify({ campaignId: selectedCampaign.id }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Send execution failed");
+        return;
+      }
       await fetchProspects(selectedCampaign.id);
       const sentCount = data.results?.filter((r: { status: string }) => r.status.startsWith("SENT")).length || 0;
-      showMsg(`Successfully sent ${sentCount} / ${data.total} DMs (Zero duplicates) ✓`);
+      const blockedCount = data.results?.filter((r: { status: string }) => r.status === "BLOCKED_DM_CLOSED").length || 0;
+      showMsg(
+        `Sent ${sentCount} / ${data.total} DMs` +
+          (blockedCount > 0 ? ` (${blockedCount} DMs closed)` : " (Zero duplicates)") +
+          " ✓"
+      );
       setView("tracker");
     } catch {
       showMsg("Send execution failed");
@@ -367,8 +579,12 @@ export default function HomePage() {
         body: JSON.stringify({ campaignId: selectedCampaign.id }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Failed to sync replies");
+        return;
+      }
       await fetchProspects(selectedCampaign.id);
-      showMsg(data.message || `Synced ${data.updated} inbound replies ✓`);
+      showMsg(data.message || `Synced ${data.updated ?? 0} inbound replies ✓`);
     } catch {
       showMsg("Failed to sync replies");
     } finally {
@@ -378,12 +594,17 @@ export default function HomePage() {
 
   const saveSetting = async (key: string, value: string) => {
     try {
-      await fetch("/api/settings", {
+      const res = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
       });
-      showMsg(`Credential saved securely ✓`);
+      if (!res.ok) {
+        showMsg("Failed to save setting");
+        return;
+      }
+      await fetchSettings();
+      showMsg(`${key} saved securely ✓`);
     } catch {
       showMsg("Failed to save setting");
     }
@@ -418,7 +639,35 @@ export default function HomePage() {
   }, [prospects]);
 
   const draftedProspects = useMemo(() => prospects.filter((p) => p.status === "DRAFTED"), [prospects]);
-  const currentReview = draftedProspects[reviewIndex] || null;
+  const safeReviewIndex = Math.min(reviewIndex, Math.max(0, draftedProspects.length - 1));
+  const currentReview = draftedProspects[safeReviewIndex] || null;
+
+  const activeDraftText = currentReview
+    ? editingDraft ?? currentReview.draftMessage ?? ""
+    : "";
+
+  const liveGuardrails = useMemo(() => {
+    if (!currentReview) {
+      return {
+        hasEvidence: false,
+        noFamiliarity: true,
+        noCliches: true,
+        withinLimit: true,
+        needsReviewFlag: false,
+      };
+    }
+    const lower = activeDraftText.toLowerCase();
+    const banned = ["pick your brain", "stumbled upon", "thought leader", "synergy", "touch base", "circle back"];
+    const fam = [/we met at/i, /great meeting you/i, /as we discussed/i, /following up on our/i];
+    const hasEvidence =
+      (currentReview.evidenceSources && currentReview.evidenceSources.length > 0) ||
+      activeDraftText.trim().length > 20;
+    const noCliches = !banned.some((b) => lower.includes(b));
+    const noFamiliarity = !fam.some((rx) => rx.test(activeDraftText));
+    const withinLimit = activeDraftText.length > 0 && activeDraftText.length <= 500;
+    const needsReviewFlag = activeDraftText.startsWith("[NEEDS REVIEW]");
+    return { hasEvidence, noFamiliarity, noCliches, withinLimit, needsReviewFlag };
+  }, [currentReview, activeDraftText]);
 
   // Filtered prospects for Discovery view
   const filteredProspects = useMemo(() => {
@@ -503,26 +752,18 @@ export default function HomePage() {
   };
 
   if (!mounted) {
-    return (
-      <div
-        suppressHydrationWarning
-        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-sky-50/25 to-indigo-50/20"
-      >
-        <div suppressHydrationWarning className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-slate-500 font-medium tracking-wide">
-            Loading Scout Console...
-          </p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="min-h-screen text-slate-900 flex flex-col font-sans" suppressHydrationWarning>
+    <div className="min-h-screen text-slate-900 flex flex-col font-sans relative" suppressHydrationWarning>
+      {/* Apple Liquid Glass Ambient Glow Orbs */}
+      <div className="fixed -top-40 -left-40 w-[550px] h-[550px] bg-gradient-to-br from-blue-300/20 via-sky-200/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-1/4 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-indigo-200/20 via-purple-100/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed -bottom-40 left-1/4 w-[700px] h-[700px] bg-gradient-to-tr from-sky-200/20 via-blue-100/10 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
       {/* ── Toast Notification ────────────────────────────── */}
       {message && (
-        <div className="fixed top-5 right-6 z-50 bg-white/90 border border-white/80 shadow-[0_12px_36px_rgba(0,0,0,0.08)] rounded-2xl px-4 py-3 text-sm flex items-center gap-2.5 animate-in slide-in-from-top-4 backdrop-blur-2xl ring-1 ring-black/[0.04]">
+        <div className="fixed top-5 right-6 z-[70] bg-white/95 border border-white/80 shadow-[0_12px_36px_rgba(0,0,0,0.12)] rounded-2xl px-4 py-3 text-sm flex items-center gap-2.5 animate-in slide-in-from-top-4 backdrop-blur-2xl ring-1 ring-black/[0.06]">
           <div className="h-2 w-2 rounded-full bg-[#0071e3] animate-ping" />
           <span className="font-medium text-slate-800">{message}</span>
         </div>
@@ -584,7 +825,13 @@ export default function HomePage() {
                 </span>
                 <button
                   onClick={(e) => toggleCampaignMode(selectedCampaign, e)}
-                  title="Click to toggle between Sandbox and Live X API"
+                  title={
+                    selectedCampaign.mode === "sandbox"
+                      ? xLiveVerified
+                        ? "Click to switch to Live X API"
+                        : "Live X API locked — verify X tokens in Settings first"
+                      : "Click to switch back to Safe Sandbox ($0)"
+                  }
                   className="cursor-pointer hover:opacity-85 transition-opacity whitespace-nowrap shrink-0"
                 >
                   <Badge variant={selectedCampaign.mode === "sandbox" ? "success" : "destructive"} className="whitespace-nowrap shrink-0">
@@ -674,8 +921,7 @@ export default function HomePage() {
                   Configure search segments, keywords, and seed accounts across Southeast Asia AI ecosystems.
                 </p>
               </div>
-              <Button onClick={() => setShowCreate(!showCreate)} className="gap-2 shadow-md">
-                <Sparkles className="w-4 h-4" />
+              <Button onClick={() => setShowCreate(!showCreate)} className="shadow-md">
                 {showCreate ? "Close Panel" : "Create New Radar"}
               </Button>
             </div>
@@ -771,10 +1017,17 @@ export default function HomePage() {
                       </label>
 
                       <label
-                        className={`flex items-start gap-3 p-3.5 border rounded-2xl cursor-pointer transition-all ${
-                          newMode === "live"
-                            ? "border-[#0071e3] bg-blue-50/60 ring-2 ring-blue-500/20"
-                            : "border-slate-200/80 bg-white/70 hover:bg-white"
+                        onClick={() => {
+                          if (!xLiveVerified) {
+                            showMsg("Verify both X tokens in Settings first to unlock Live X API mode.");
+                          }
+                        }}
+                        className={`flex items-start gap-3 p-3.5 border rounded-2xl transition-all ${
+                          !xLiveVerified
+                            ? "border-slate-200/70 bg-slate-50/70 opacity-80 cursor-not-allowed"
+                            : newMode === "live"
+                            ? "border-[#0071e3] bg-blue-50/60 ring-2 ring-blue-500/20 cursor-pointer"
+                            : "border-slate-200/80 bg-white/70 hover:bg-white cursor-pointer"
                         }`}
                       >
                         <input
@@ -782,16 +1035,28 @@ export default function HomePage() {
                           name="campaign_mode"
                           value="live"
                           checked={newMode === "live"}
-                          onChange={() => setNewMode("live")}
+                          disabled={!xLiveVerified}
+                          onChange={() => {
+                            if (xLiveVerified) setNewMode("live");
+                          }}
                           className="mt-1"
                         />
                         <div>
-                          <div className="font-semibold text-sm text-slate-900 flex items-center gap-1.5">
+                          <div className="font-semibold text-sm text-slate-900 flex items-center gap-1.5 flex-wrap">
                             <Zap className="w-4 h-4 text-amber-600" />
                             Live X API v2 (BYOK Mode)
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                xLiveVerified
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-amber-50 text-amber-700 border-amber-200"
+                              }`}
+                            >
+                              {xLiveVerified ? "Verified ✓" : "Locked — Verify X in Settings"}
+                            </span>
                           </div>
                           <div className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Connects directly to X API v2 endpoints with Token-Bucket rate limiting (15 DMs/15 min). Requires valid X Bearer & OAuth tokens in Settings.
+                            Connects directly to X API v2 endpoints with Token-Bucket rate limiting (15 DMs/15 min). Requires passing Test Connection with both X tokens in Settings.
                           </div>
                         </div>
                       </label>
@@ -837,7 +1102,13 @@ export default function HomePage() {
                         <button
                           type="button"
                           onClick={(e) => toggleCampaignMode(c, e)}
-                          title="Click to toggle between Sandbox and Live mode"
+                          title={
+                            c.mode === "sandbox"
+                              ? xLiveVerified
+                                ? "Click to switch to Live X API"
+                                : "Live X API locked — verify X tokens in Settings first"
+                              : "Click to switch back to Sandbox"
+                          }
                           className="cursor-pointer shrink-0"
                         >
                           <Badge variant={c.mode === "sandbox" ? "success" : "destructive"} className="whitespace-nowrap shrink-0">
@@ -901,35 +1172,31 @@ export default function HomePage() {
                   size="sm"
                   onClick={runDiscovery}
                   disabled={!selectedCampaign || loading}
-                  className="gap-1.5"
                 >
-                  <Search className="w-3.5 h-3.5 text-[#0071e3]" />
                   Index Candidates
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={runScoring}
+                  onClick={() => runScoring()}
                   disabled={!selectedCampaign || loading || stats.discovered === 0}
-                  className="gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                  className="border-emerald-300 text-emerald-800 hover:bg-emerald-50"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                   Run Fit Scoring
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => runDrafting(0.4)}
                   disabled={!selectedCampaign || loading || stats.scored === 0}
-                  className="gap-1.5 shadow-md"
+                  className="shadow-md"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
                   Draft DMs (Fit ≥ 40%)
                 </Button>
               </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/70 p-3 rounded-2xl border border-white/80 shadow-2xs backdrop-blur-xl">
+            <div className="relative z-20 flex flex-col sm:flex-row items-center gap-3 bg-white/70 p-3 rounded-2xl border border-white/80 shadow-2xs backdrop-blur-xl">
               <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
                 <Input
@@ -941,28 +1208,23 @@ export default function HomePage() {
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <select
+                <Select
+                  ariaLabel="Filter by country"
                   value={countryFilter}
-                  onChange={(e) => setCountryFilter(e.target.value)}
-                  className="h-9 rounded-xl border border-slate-200/90 bg-white/80 px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
-                >
-                  <option value="ALL">All SEA Countries</option>
-                  <option value="SG">🇸🇬 Singapore</option>
-                  <option value="VN">🇻🇳 Vietnam</option>
-                  <option value="ID">🇮🇩 Indonesia</option>
-                  <option value="TH">🇹🇭 Thailand</option>
-                  <option value="MY">🇲🇾 Malaysia</option>
-                </select>
+                  onChange={setCountryFilter}
+                  options={COUNTRY_FILTER_OPTIONS}
+                  className="flex-1 sm:w-[175px]"
+                  menuClassName="min-w-[190px] right-0 left-auto sm:left-0 sm:right-auto"
+                />
 
-                <select
-                  value={minScoreFilter}
-                  onChange={(e) => setMinScoreFilter(parseFloat(e.target.value))}
-                  className="h-9 rounded-xl border border-slate-200/90 bg-white/80 px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
-                >
-                  <option value="0">All Scores</option>
-                  <option value="0.7">High Fit Only (≥ 70%)</option>
-                  <option value="0.4">Relevant (≥ 40%)</option>
-                </select>
+                <Select
+                  ariaLabel="Filter by fit score"
+                  value={String(minScoreFilter)}
+                  onChange={(val) => setMinScoreFilter(parseFloat(val))}
+                  options={SCORE_FILTER_OPTIONS}
+                  className="flex-1 sm:w-[195px]"
+                  menuClassName="min-w-[210px] right-0 left-auto"
+                />
               </div>
             </div>
 
@@ -1145,15 +1407,44 @@ export default function HomePage() {
                     <span className="text-xs text-slate-500">
                       Status: {getStatusBadge(inspectProspect.status)}
                     </span>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setInspectProspect(null);
-                        setView("review");
-                      }}
-                    >
-                      Open in Review Queue
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {(inspectProspect.status === "DISCOVERED" || inspectProspect.status === "SCORED") && (
+                        <Button
+                          size="sm"
+                          onClick={() => scoreAndDraftSingle(inspectProspect)}
+                          disabled={loading}
+                        >
+                          {inspectProspect.status === "DISCOVERED" ? "Score & Draft DM" : "Draft DM"}
+                        </Button>
+                      )}
+                      {inspectProspect.status === "DRAFTED" && (
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const idx = draftedProspects.findIndex((p) => p.id === inspectProspect.id);
+                            setReviewIndex(idx >= 0 ? idx : 0);
+                            setEditingDraft(null);
+                            setInspectProspect(null);
+                            setView("review");
+                          }}
+                        >
+                          Open in Review Queue
+                        </Button>
+                      )}
+                      {["SENT", "SENT_SANDBOX", "REPLIED", "BLOCKED_DM_CLOSED", "APPROVED"].includes(inspectProspect.status) && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedThreadId(inspectProspect.id);
+                            setInspectProspect(null);
+                            setView("tracker");
+                          }}
+                        >
+                          View in Tracker
+                        </Button>
+                      )}
+                    </div>
                   </CardFooter>
                 </Card>
               </div>
@@ -1186,9 +1477,8 @@ export default function HomePage() {
               <Button
                 onClick={sendApproved}
                 disabled={stats.approved === 0 || loading}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
               >
-                <Send className="w-4 h-4" />
                 Safely Send {stats.approved} Approved DMs
               </Button>
             </div>
@@ -1290,7 +1580,7 @@ export default function HomePage() {
                             Personalized Outreach Message Studio
                           </CardTitle>
                           <CardDescription>
-                            Reviewing {reviewIndex + 1} of {draftedProspects.length} in queue
+                            Reviewing {safeReviewIndex + 1} of {draftedProspects.length} in queue
                           </CardDescription>
                         </div>
 
@@ -1309,40 +1599,66 @@ export default function HomePage() {
                           <UserCheck className="w-3.5 h-3.5 text-[#0071e3]" />
                           Sender Identity: <strong>GenAI Fund Team</strong>
                         </span>
-                        <span className="font-mono text-slate-500">
-                          {(editingDraft || currentReview.draftMessage || "").length} / 280 chars
+                        <span
+                          className={`font-mono font-medium ${
+                            activeDraftText.length > 500
+                              ? "text-rose-600"
+                              : activeDraftText.length > 280
+                              ? "text-amber-600"
+                              : "text-slate-500"
+                          }`}
+                        >
+                          {activeDraftText.length} / 280 chars (max 500)
                         </span>
                       </div>
+
+                      {liveGuardrails.needsReviewFlag && (
+                        <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
+                          <span>Flagged <strong>[NEEDS REVIEW]</strong> by post-LLM guardrail. Please verify before approving.</span>
+                        </div>
+                      )}
 
                       {/* Textarea */}
                       <Textarea
                         rows={7}
-                        value={editingDraft || currentReview.draftMessage || ""}
+                        value={activeDraftText}
                         onChange={(e) => setEditingDraft(e.target.value)}
-                        onFocus={() => {
-                          if (!editingDraft) setEditingDraft(currentReview.draftMessage || "");
-                        }}
                         className="font-sans text-sm leading-relaxed bg-slate-50/70 border-slate-200/90 focus:bg-white text-slate-900"
                         placeholder="Draft message will appear here..."
                       />
 
-                      {/* Guardrail Checklist */}
-                      <div className="p-3.5 rounded-2xl border border-emerald-200/70 bg-emerald-50/40 text-xs space-y-1.5">
-                        <div className="font-semibold text-emerald-800 text-[10px] uppercase tracking-wider mb-1">
+                      {/* Live Guardrail Checklist */}
+                      <div
+                        className={`p-3.5 rounded-2xl border text-xs space-y-1.5 ${
+                          liveGuardrails.hasEvidence &&
+                          liveGuardrails.noFamiliarity &&
+                          liveGuardrails.noCliches &&
+                          liveGuardrails.withinLimit &&
+                          !liveGuardrails.needsReviewFlag
+                            ? "border-emerald-200/70 bg-emerald-50/40"
+                            : "border-amber-200/80 bg-amber-50/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-slate-700 text-[10px] uppercase tracking-wider mb-1">
                           Automated FDE Guardrail Verification
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-[11px]">
-                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                            <Check className="w-3.5 h-3.5" /> Verbatim evidence cited
+                          <span className={`flex items-center gap-1.5 font-medium ${liveGuardrails.hasEvidence ? "text-emerald-700" : "text-amber-700"}`}>
+                            {liveGuardrails.hasEvidence ? <Check className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                            Verbatim evidence cited
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                            <Check className="w-3.5 h-3.5" /> Zero invented familiarity
+                          <span className={`flex items-center gap-1.5 font-medium ${liveGuardrails.noFamiliarity ? "text-emerald-700" : "text-rose-700"}`}>
+                            {liveGuardrails.noFamiliarity ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                            Zero invented familiarity
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                            <Check className="w-3.5 h-3.5" /> No recruiter/sales clichés
+                          <span className={`flex items-center gap-1.5 font-medium ${liveGuardrails.noCliches ? "text-emerald-700" : "text-rose-700"}`}>
+                            {liveGuardrails.noCliches ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                            No recruiter/sales clichés
                           </span>
-                          <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                            <Check className="w-3.5 h-3.5" /> Anti-duplicate check: Passed
+                          <span className={`flex items-center gap-1.5 font-medium ${liveGuardrails.withinLimit ? "text-emerald-700" : "text-rose-700"}`}>
+                            {liveGuardrails.withinLimit ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                            Length & anti-duplicate OK
                           </span>
                         </div>
                       </div>
@@ -1354,8 +1670,8 @@ export default function HomePage() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setEditingDraft("");
-                        setReviewIndex(Math.min(reviewIndex + 1, draftedProspects.length - 1));
+                        setEditingDraft(null);
+                        setReviewIndex(Math.min(safeReviewIndex + 1, Math.max(0, draftedProspects.length - 1)));
                       }}
                       className="gap-1.5"
                     >
@@ -1365,23 +1681,16 @@ export default function HomePage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          handleApproval(currentReview.id, "reject");
-                          setEditingDraft("");
-                        }}
-                        className="gap-1.5"
+                        onClick={() => handleApproval(currentReview.id, "reject")}
                       >
-                        <X className="w-3.5 h-3.5" /> Reject [R]
+                        Reject [R]
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => {
-                          handleApproval(currentReview.id, "approve");
-                          setEditingDraft("");
-                        }}
-                        className="gap-1.5 bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-sm shadow-blue-500/25"
+                        onClick={() => handleApproval(currentReview.id, "approve")}
+                        className="bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-sm shadow-blue-500/25"
                       >
-                        <Check className="w-3.5 h-3.5" /> Approve & Queue [A]
+                        Approve & Queue [A]
                       </Button>
                     </div>
                   </CardFooter>
@@ -1424,8 +1733,7 @@ export default function HomePage() {
                   Track delivered conversations, manage inbound replies, and monitor platform health.
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={syncReplies} disabled={!selectedCampaign || loading} className="gap-2">
-                <RefreshCw className="w-3.5 h-3.5 text-[#0071e3]" />
+              <Button variant="outline" size="sm" onClick={syncReplies} disabled={!selectedCampaign || loading}>
                 Sync Inbound Replies
               </Button>
             </div>
@@ -1588,7 +1896,7 @@ export default function HomePage() {
             SCREEN 5: SETTINGS & SYSTEM DIAGNOSTICS
             ═════════════════════════════════════════════════════ */}
         {view === "settings" && (
-          <div className="max-w-3xl space-y-6">
+          <div className="max-w-3xl space-y-6 pb-20">
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">Console Settings & Credentials</h1>
               <p className="text-sm text-slate-500 mt-0.5">
@@ -1608,8 +1916,7 @@ export default function HomePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" size="sm" onClick={testConnection} disabled={loading} className="gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-[#0071e3]" />
+                <Button variant="outline" size="sm" onClick={testConnection} disabled={loading}>
                   Run Diagnostics & Test Connection
                 </Button>
 
@@ -1623,8 +1930,30 @@ export default function HomePage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500">Status:</span>
-                      <span className={healthData.connected ? "text-emerald-700 font-semibold" : "text-amber-700 font-medium"}>
-                        {healthData.connected ? "Verified & Authenticated ✓" : "Safe Sandbox Active"}
+                      <span
+                        className={
+                          healthData.connected
+                            ? "text-emerald-700 font-semibold"
+                            : "text-amber-700 font-medium"
+                        }
+                      >
+                        {healthData.mode === "sandbox"
+                          ? "Safe Sandbox Active ✓"
+                          : healthData.connected
+                          ? "Verified & Authenticated ✓"
+                          : "Live Credentials Failed / Incomplete"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500">Live X Mode Gate:</span>
+                      <span
+                        className={
+                          xLiveVerified
+                            ? "text-emerald-700 font-semibold"
+                            : "text-amber-700 font-medium"
+                        }
+                      >
+                        {xLiveVerified ? "Unlocked ✓" : "Locked (Requires verified X tokens)"}
                       </span>
                     </div>
                     {healthData.username && (
@@ -1633,12 +1962,20 @@ export default function HomePage() {
                         <span className="text-slate-900 font-semibold">@{healthData.username}</span>
                       </div>
                     )}
-                    {healthData.rate_limit_remaining !== undefined && (
+                    {(healthData.rate_limit_remaining !== undefined || healthData.endpoints?.dm_send?.remaining !== undefined) && (
                       <div className="flex justify-between items-center font-mono">
                         <span className="text-slate-500">Token Bucket Available:</span>
-                        <span className="text-emerald-700 font-semibold">{healthData.rate_limit_remaining} / 15 slots</span>
+                        <span className="text-emerald-700 font-semibold">
+                          {healthData.rate_limit_remaining ?? healthData.endpoints?.dm_send?.remaining} / 15 slots
+                        </span>
                       </div>
                     )}
+                    <div className="flex justify-between items-center font-mono">
+                      <span className="text-slate-500">LLM Intelligence Engine:</span>
+                      <span className="text-slate-900 font-semibold">
+                        {healthData.hasLLMKey ? `Live (${healthData.llmProvider || "gemini"})` : "Heuristic Sandbox ($0 fallback)"}
+                      </span>
+                    </div>
                     {healthData.note && (
                       <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 mt-2">
                         💡 {healthData.note}
@@ -1657,12 +1994,17 @@ export default function HomePage() {
             {/* X API Keys */}
             <Card className="border-white/90 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2 text-slate-900">
-                  <Zap className="w-4 h-4 text-amber-600" />
-                  X (Twitter) API v2 Configuration
-                </CardTitle>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <CardTitle className="text-base flex items-center gap-2 text-slate-900">
+                    <Zap className="w-4 h-4 text-amber-600" />
+                    X (Twitter) API v2 Configuration
+                  </CardTitle>
+                  <Badge variant={xLiveVerified ? "success" : "secondary"}>
+                    {xLiveVerified ? "Live Mode Unlocked ✓" : "Live Mode Locked"}
+                  </Badge>
+                </div>
                 <CardDescription>
-                  Required only for Live mode. If left blank, the app runs cleanly in Safe Sandbox mode.
+                  Required only for Live mode. Save both tokens below, then pass Run Diagnostics &amp; Test Connection above to unlock Live X API.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1671,13 +2013,20 @@ export default function HomePage() {
                   { key: "x_access_token", label: "User OAuth 2.0 Access Token", placeholder: "User context token for DM sending" },
                 ].map(({ key, label, placeholder }) => (
                   <div key={key}>
-                    <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
-                      {label}
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-semibold uppercase text-slate-600">
+                        {label}
+                      </label>
+                      {savedSettingHints[key] && (
+                        <span className="text-[11px] font-mono text-emerald-700 font-medium">
+                          Configured ({savedSettingHints[key]}) ✓
+                        </span>
+                      )}
+                    </div>
                     <div className="flex gap-2">
                       <Input
                         type="password"
-                        placeholder={placeholder}
+                        placeholder={savedSettingHints[key] ? `Saved (${savedSettingHints[key]}) — enter new value to update` : placeholder}
                         value={settingsValues[key] || ""}
                         onChange={(e) => setSettingsValues({ ...settingsValues, [key]: e.target.value })}
                         className="font-mono text-xs"
@@ -1692,7 +2041,7 @@ export default function HomePage() {
             </Card>
 
             {/* LLM Provider */}
-            <Card className="border-white/90 bg-white/80 shadow-sm">
+            <Card className="border-white/90 bg-white/80 shadow-sm relative z-10">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2 text-slate-900">
                   <Cpu className="w-4 h-4 text-[#0071e3]" />
@@ -1701,47 +2050,87 @@ export default function HomePage() {
                 <CardDescription>Choose the AI model used for evidence evaluation and DM drafting.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
-                    AI Provider
-                  </label>
-                  <select
-                    className="flex h-9 w-full rounded-xl border border-slate-200/90 bg-white px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/25"
-                    value={settingsValues.llm_provider || "gemini"}
-                    onChange={(e) => {
-                      setSettingsValues({ ...settingsValues, llm_provider: e.target.value });
-                      saveSetting("llm_provider", e.target.value);
-                    }}
-                  >
-                    <option value="gemini">Google Gemini 2.5 Flash (Recommended)</option>
-                    <option value="openai">OpenAI GPT-4o</option>
-                    <option value="anthropic">Anthropic Claude 3.5 Sonnet</option>
-                  </select>
-                </div>
+                {(() => {
+                  const selectedProviderId = settingsValues.llm_provider || "gemini";
+                  const activeProvider =
+                    LLM_PROVIDER_CONFIGS.find((p) => p.value === selectedProviderId) || LLM_PROVIDER_CONFIGS[0];
+                  const providerOptions = LLM_PROVIDER_CONFIGS.map((p) => ({
+                    value: p.value,
+                    label: p.label,
+                    description: p.description,
+                    badge: savedSettingHints[p.keyName] ? "Saved ✓" : undefined,
+                  }));
+                  const savedHint = savedSettingHints[activeProvider.keyName];
 
-                {[
-                  { key: "google_api_key", label: "Gemini API Key", placeholder: "AIzaSy..." },
-                  { key: "openai_api_key", label: "OpenAI API Key", placeholder: "sk-..." },
-                  { key: "anthropic_api_key", label: "Anthropic API Key", placeholder: "sk-ant-..." },
-                ].map(({ key, label, placeholder }) => (
-                  <div key={key}>
-                    <label className="text-xs font-semibold uppercase text-slate-600 block mb-1">
-                      {label}
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="password"
-                        placeholder={placeholder}
-                        value={settingsValues[key] || ""}
-                        onChange={(e) => setSettingsValues({ ...settingsValues, [key]: e.target.value })}
-                        className="font-mono text-xs"
-                      />
-                      <Button variant="outline" size="sm" onClick={() => saveSetting(key, settingsValues[key] || "")}>
-                        Save
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  return (
+                    <>
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 block mb-1.5">
+                          AI Provider
+                        </label>
+                        <Select
+                          ariaLabel="Select AI Provider"
+                          value={activeProvider.value}
+                          onChange={(val) => {
+                            setSettingsValues((prev) => ({ ...prev, llm_provider: val }));
+                            saveSetting("llm_provider", val);
+                          }}
+                          options={providerOptions}
+                        />
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200/80 bg-slate-50/75 p-4 space-y-2.5 shadow-2xs transition-all">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+                            {activeProvider.keyLabel}
+                          </label>
+                          {savedHint ? (
+                            <span className="text-[11px] font-mono text-emerald-700 font-medium px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/70">
+                              Configured ({savedHint}) ✓
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-medium text-slate-500 px-2 py-0.5 rounded-full bg-white border border-slate-200/80">
+                              Sandbox Fallback ($0)
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            type="password"
+                            placeholder={
+                              savedHint
+                                ? `Saved (${savedHint}) — enter new value to update`
+                                : activeProvider.placeholder
+                            }
+                            value={settingsValues[activeProvider.keyName] || ""}
+                            onChange={(e) =>
+                              setSettingsValues((prev) => ({
+                                ...prev,
+                                [activeProvider.keyName]: e.target.value,
+                              }))
+                            }
+                            className="font-mono text-xs bg-white"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              saveSetting(
+                                activeProvider.keyName,
+                                settingsValues[activeProvider.keyName] || ""
+                              )
+                            }
+                          >
+                            Save
+                          </Button>
+                        </div>
+                        <p className="text-[11px] text-slate-500 leading-relaxed">
+                          {activeProvider.helper}
+                        </p>
+                      </div>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           </div>
@@ -1750,7 +2139,7 @@ export default function HomePage() {
 
       {/* ── Global Loading Overlay (Apple Liquid Glass) ───── */}
       {loading && (
-        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in">
+        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-[60] animate-in fade-in">
           <div className="bg-white/95 border border-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center ring-1 ring-black/[0.04]">
             <div className="h-8 w-8 border-3 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-semibold text-slate-900">{loadingText}</span>
