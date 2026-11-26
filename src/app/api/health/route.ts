@@ -2,21 +2,17 @@ import { NextResponse } from "next/server";
 import { SandboxXProvider } from "@/lib/providers/x/sandbox";
 import { LiveXProvider } from "@/lib/providers/x/live";
 import { getLiveXStatus, getSettingsMap, upsertSetting } from "@/lib/db/settings-helper";
+import { resolveLLMFromSettings } from "@/lib/providers/llm/factory";
 
 export async function GET() {
   const settingsMap = await getSettingsMap();
 
   const xGate = getLiveXStatus(settingsMap);
   const hasXKeys = xGate.hasBearerToken || xGate.hasAccessToken;
-  const llmProvider = settingsMap.llm_provider || "gemini";
-  const hasLLMKey = !!(
-    settingsMap.google_api_key ||
-    settingsMap.openai_api_key ||
-    settingsMap.anthropic_api_key ||
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-    process.env.OPENAI_API_KEY ||
-    process.env.ANTHROPIC_API_KEY
-  );
+  const llmConfig = resolveLLMFromSettings(settingsMap);
+  const llmProvider = llmConfig.provider;
+  const llmModel = llmConfig.model;
+  const hasLLMKey = llmConfig.hasKey;
 
   if (hasXKeys) {
     try {
@@ -36,6 +32,7 @@ export async function GET() {
           : health.error,
         hasLLMKey,
         llmProvider,
+        llmModel,
         hasBearerToken: xGate.hasBearerToken,
         hasAccessToken: xGate.hasAccessToken,
         liveVerified: verified,
@@ -50,6 +47,7 @@ export async function GET() {
         error: msg,
         hasLLMKey,
         llmProvider,
+        llmModel,
         hasBearerToken: xGate.hasBearerToken,
         hasAccessToken: xGate.hasAccessToken,
         liveVerified: false,
@@ -70,6 +68,7 @@ export async function GET() {
     ...health,
     hasLLMKey,
     llmProvider,
+    llmModel,
     hasBearerToken: false,
     hasAccessToken: false,
     liveVerified: false,

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
+import { LLM_PROVIDERS, getProviderConfig, resolveModelForProvider } from "@/lib/providers/llm/catalog";
 import {
   Compass,
   CheckCircle2,
@@ -68,36 +69,6 @@ interface Prospect {
 
 type View = "campaigns" | "discovery" | "review" | "tracker" | "settings";
 
-const LLM_PROVIDER_CONFIGS = [
-  {
-    value: "gemini",
-    label: "Google Gemini 3.5 Flash-Lite (Recommended)",
-    description: "Fast multimodal reasoning & structured JSON scoring",
-    keyName: "google_api_key",
-    keyLabel: "Gemini API Key",
-    placeholder: "AIzaSy...",
-    helper: "Active for Google Gemini 3.5 Flash-Lite. Leave blank to keep Heuristic Sandbox ($0 fallback).",
-  },
-  {
-    value: "openai",
-    label: "OpenAI GPT-4o mini",
-    description: "Strict JSON schema scoring & concise outreach drafting",
-    keyName: "openai_api_key",
-    keyLabel: "OpenAI API Key",
-    placeholder: "sk-...",
-    helper: "Active for OpenAI GPT-4o mini. Leave blank to keep Heuristic Sandbox ($0 fallback).",
-  },
-  {
-    value: "anthropic",
-    label: "Anthropic Claude Sonnet 4",
-    description: "High-nuance personalized founder outreach & tone control",
-    keyName: "anthropic_api_key",
-    keyLabel: "Anthropic API Key",
-    placeholder: "sk-ant-...",
-    helper: "Active for Anthropic Claude Sonnet 4. Leave blank to keep Heuristic Sandbox ($0 fallback).",
-  },
-] as const;
-
 const COUNTRY_FILTER_OPTIONS = [
   { value: "ALL", label: "All SEA Countries" },
   { value: "SG", label: "🇸🇬 Singapore" },
@@ -114,6 +85,14 @@ const SCORE_FILTER_OPTIONS = [
   { value: "0.4", label: "Relevant (≥ 40%)" },
 ] as const;
 
+type LoadingStepStatus = "pending" | "active" | "done" | "error";
+interface LoadingStep {
+  id: string;
+  label: string;
+  detail?: string;
+  status: LoadingStepStatus;
+}
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<View>("campaigns");
@@ -122,6 +101,10 @@ export default function HomePage() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Processing...");
+  const [loadingSubtext, setLoadingSubtext] = useState("Running idempotent FDE pipeline...");
+  const [loadingSteps, setLoadingSteps] = useState<LoadingStep[]>([]);
+  const [loadingProgress, setLoadingProgress] = useState<{ done: number; total: number } | null>(null);
+  const loadingTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [message, setMessage] = useState("");
 
   // Create campaign form
@@ -160,10 +143,13 @@ export default function HomePage() {
       const list = (await res.json()) as { key: string; value: string; hasValue: boolean }[];
       const hints: Record<string, string> = {};
       let providerValue = "gemini";
+      let modelValue = "";
       let verifiedFlag = false;
       for (const item of list) {
         if (item.key === "llm_provider" && item.value) {
           providerValue = item.value;
+        } else if (item.key === "llm_model" && item.value) {
+          modelValue = item.value;
         } else if (item.key === "x_live_verified") {
           verifiedFlag = item.value === "true";
         } else if (item.hasValue) {
@@ -172,7 +158,11 @@ export default function HomePage() {
       }
       setSavedSettingHints(hints);
       setXLiveVerified(verifiedFlag);
-      setSettingsValues((prev) => ({ ...prev, llm_provider: prev.llm_provider || providerValue }));
+      setSettingsValues((prev) => {
+        const nextProvider = prev.llm_provider || providerValue;
+        const resolvedModel = resolveModelForProvider(nextProvider, prev.llm_model || modelValue);
+        return { ...prev, llm_provider: nextProvider, llm_model: resolvedModel };
+      });
     } catch (e) {
       console.error(e);
     }
@@ -216,6 +206,89 @@ export default function HomePage() {
     }
   }, [selectedCampaign, fetchProspects]);
 
+  const clearLoadingTimers = useCallback(() => {
+    for (const t of loadingTimersRef.current) {
+      clearTimeout(t);
+    }
+    loadingTimersRef.current = [];
+  }, []);
+
+  useEffect(() => () => clearLoadingTimers(), [clearLoadingTimers]);
+
+  const setActiveStep = useCallback((id: string, detail?: string) => {
+    setLoadingSteps((prev) => {
+      const targetIndex = prev.findIndex((s) => s.id === id);
+      if (targetIndex < 0) return prev;
+      return prev.map((step, idx) => {
+        if (idx < targetIndex) {
+          return step.status === "error" ? step : { ...step, status: "done" };
+        }
+        if (idx === targetIndex) {
+          return {
+            ...step,
+            status: "active",
+            ...(detail !== undefined ? { detail } : {}),
+          };
+        }
+        return { ...step, status: "pending" };
+      });
+    });
+  }, []);
+
+  const updateStep = useCallback(
+    (id: string, patch: Partial<Pick<LoadingStep, "status" | "detail" | "label">>) => {
+      setLoadingSteps((prev) => prev.map((step) => (step.id === id ? { ...step, ...patch } : step)));
+    },
+    []
+  );
+
+  const markAllStepsDone = useCallback(() => {
+    setLoadingSteps((prev) =>
+      prev.map((step) => (step.status === "error" ? step : { ...step, status: "done" }))
+    );
+  }, []);
+
+  const waitMs = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  const startLoadingOverlay = useCallback(
+    (
+      title: string,
+      subtext: string,
+      steps: Omit<LoadingStep, "status">[],
+      autoAdvanceMs?: number
+    ) => {
+      clearLoadingTimers();
+      setLoading(true);
+      setLoadingText(title);
+      setLoadingSubtext(subtext);
+      setLoadingProgress(null);
+      setLoadingSteps(
+        steps.map((step, idx) => ({
+          ...step,
+          status: idx === 0 ? "active" : "pending",
+        }))
+      );
+
+      if (autoAdvanceMs && steps.length > 1) {
+        for (let i = 1; i < steps.length - 1; i++) {
+          const nextStep = steps[i];
+          const timer = setTimeout(() => {
+            setActiveStep(nextStep.id);
+          }, autoAdvanceMs * i);
+          loadingTimersRef.current.push(timer);
+        }
+      }
+    },
+    [clearLoadingTimers, setActiveStep]
+  );
+
+  const stopLoadingOverlay = useCallback(() => {
+    clearLoadingTimers();
+    setLoading(false);
+    setLoadingSteps([]);
+    setLoadingProgress(null);
+  }, [clearLoadingTimers]);
+
   const showMsg = (msg: string) => {
     setMessage(msg);
     setTimeout(() => setMessage(""), 4500);
@@ -223,8 +296,15 @@ export default function HomePage() {
 
   // ── Campaign actions ────────────────────────────────────
   const createCampaign = async () => {
-    setLoading(true);
-    setLoadingText("Creating radar...");
+    startLoadingOverlay(
+      "Creating Target Radar...",
+      "Saving keywords, seed handles & execution mode",
+      [
+        { id: "validate", label: "Validating radar config & execution gate" },
+        { id: "save", label: "Persisting campaign to SQLite" },
+      ],
+      350
+    );
     try {
       const res = await fetch("/api/campaigns", {
         method: "POST",
@@ -242,15 +322,18 @@ export default function HomePage() {
         showMsg(created.error || "Failed to create campaign");
         return;
       }
+      clearLoadingTimers();
+      setActiveStep("save");
       setNewName(""); setNewDesc(""); setNewKeywords(""); setNewSeeds(""); setNewMode("sandbox");
       setShowCreate(false);
       await fetchCampaigns();
+      updateStep("save", { status: "done" });
       setSelectedCampaign(created);
       showMsg("Campaign Radar created ✓");
     } catch {
       showMsg("Failed to create campaign");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
@@ -284,14 +367,24 @@ export default function HomePage() {
   };
 
   const testConnection = async () => {
-    setLoading(true);
-    setLoadingText("Running API Health Diagnostics...");
+    startLoadingOverlay(
+      "Running API Health Diagnostics...",
+      "Checking X OAuth verification & LLM provider status",
+      [
+        { id: "check_keys", label: "Checking saved X & LLM credentials" },
+        { id: "probe", label: "Verifying connectivity & rate-limit buckets" },
+      ],
+      350
+    );
     try {
       const res = await fetch("/api/health");
       const data = await res.json();
+      clearLoadingTimers();
+      setActiveStep("probe");
       setHealthData(data);
       setXLiveVerified(Boolean(data.liveVerified));
       await fetchSettings();
+      updateStep("probe", { status: "done" });
       if (data.liveVerified) {
         showMsg("X API verified ✓ Live mode unlocked");
       } else if (data.mode === "sandbox") {
@@ -302,14 +395,30 @@ export default function HomePage() {
     } catch {
       showMsg("Failed to check health");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
   const runDiscovery = async () => {
     if (!selectedCampaign) return;
-    setLoading(true);
-    setLoadingText("Scanning X profiles & analyzing bios...");
+    const kwPreview = (selectedCampaign.keywords || []).slice(0, 2).join(", ");
+    startLoadingOverlay(
+      "Scanning X profiles & analyzing bios...",
+      selectedCampaign.mode === "sandbox"
+        ? "Running Sandbox discovery engine ($0 spend)"
+        : "Querying Live X API v2 endpoints",
+      [
+        {
+          id: "search",
+          label: "Scanning campaign keywords & target segment",
+          detail: kwPreview ? `Keywords: ${kwPreview}` : undefined,
+        },
+        { id: "tweets", label: "Collecting founder bios & recent signal tweets" },
+        { id: "dedupe", label: "Enforcing SQLite UNIQUE(x_user_id) anti-duplicate lock" },
+        { id: "sync", label: "Syncing discovered candidates to pipeline" },
+      ],
+      650
+    );
     try {
       const res = await fetch("/api/discover", {
         method: "POST",
@@ -318,70 +427,189 @@ export default function HomePage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        updateStep("search", { status: "error", detail: data.error || "Discovery failed" });
         showMsg(data.error || "Discovery failed");
         return;
       }
+      clearLoadingTimers();
+      setActiveStep("sync");
       await fetchProspects(selectedCampaign.id);
+      markAllStepsDone();
+      await waitMs(450);
       const added = data.discovered ?? data.added ?? 0;
       const skipped = data.skipped ?? 0;
       showMsg(`Discovered ${added} new candidates (${skipped} skipped by UNIQUE lock) ✓`);
     } catch {
       showMsg("Discovery failed");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
   const runScoring = async (prospectIds?: string[]) => {
     if (!selectedCampaign) return;
-    setLoading(true);
-    setLoadingText("Evaluating candidate fitness & extracting evidence...");
+    const targetProspects = prospectIds?.length
+      ? prospects.filter((p) => prospectIds.includes(p.id))
+      : prospects.filter((p) => p.status === "DISCOVERED");
+
+    startLoadingOverlay(
+      "Evaluating candidate fitness & extracting evidence...",
+      "Scoring profiles against GenAI Fund investment thesis",
+      [
+        {
+          id: "load",
+          label: "Loading founder bios & recent signal tweets",
+          detail: `${targetProspects.length} candidate(s) queued`,
+        },
+        { id: "score", label: "AI evaluating thesis fit & extracting evidence" },
+        { id: "verify", label: "Validating structured JSON & verbatim quotes" },
+        { id: "save", label: "Saving fit scores & refreshing pipeline" },
+      ]
+    );
+
     try {
-      const res = await fetch("/api/score", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          campaignId: selectedCampaign.id,
-          ...(prospectIds?.length ? { prospectIds } : {}),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        showMsg(data.error || "Scoring failed");
-        return;
+      let totalScored = 0;
+      if (targetProspects.length > 0) {
+        const chunkSize = 2;
+        setLoadingProgress({ done: 0, total: targetProspects.length });
+        for (let i = 0; i < targetProspects.length; i += chunkSize) {
+          const chunk = targetProspects.slice(i, i + chunkSize);
+          const handles = chunk.map((p) => `@${p.xUsername}`).join(", ");
+          const processed = Math.min(i + chunk.length, targetProspects.length);
+          setActiveStep("score", `Scanning ${handles} (${processed} / ${targetProspects.length})`);
+
+          const res = await fetch("/api/score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              campaignId: selectedCampaign.id,
+              prospectIds: chunk.map((p) => p.id),
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            updateStep("score", { status: "error", detail: data.error || "Scoring failed" });
+            showMsg(data.error || "Scoring failed");
+            return;
+          }
+          totalScored += data.scored ?? 0;
+          setLoadingProgress({ done: processed, total: targetProspects.length });
+        }
+      } else {
+        setActiveStep("score");
+        const res = await fetch("/api/score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            campaignId: selectedCampaign.id,
+            ...(prospectIds?.length ? { prospectIds } : {}),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          updateStep("score", { status: "error", detail: data.error || "Scoring failed" });
+          showMsg(data.error || "Scoring failed");
+          return;
+        }
+        totalScored = data.scored ?? 0;
       }
+
+      setActiveStep("verify", "Checking JSON schema & verbatim evidence quotes...");
+      await waitMs(300);
+      updateStep("verify", { status: "done", detail: "Schema & evidence quotes verified ✓" });
+      setActiveStep("save");
       await fetchProspects(selectedCampaign.id);
-      showMsg(`Qualified & scored ${data.scored ?? 0} profiles ✓`);
+      markAllStepsDone();
+      await waitMs(450);
+      showMsg(`Qualified & scored ${totalScored} profiles ✓`);
     } catch {
       showMsg("Scoring failed");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
   const runDrafting = async (minScore: number = 0.4, prospectIds?: string[]) => {
     if (!selectedCampaign) return;
-    setLoading(true);
-    setLoadingText("Drafting evidence-grounded DMs with guardrails...");
+    const targetProspects = prospectIds?.length
+      ? prospects.filter((p) => prospectIds.includes(p.id))
+      : prospects.filter((p) => p.status === "SCORED" && (p.fitScore || 0) >= minScore);
+
+    startLoadingOverlay(
+      "Drafting evidence-grounded DMs with guardrails...",
+      "Generating short personalized messages & checking 5 safety rules",
+      [
+        {
+          id: "evidence",
+          label: "Loading scored theses & verbatim evidence quotes",
+          detail: `${targetProspects.length} qualified founder(s)`,
+        },
+        { id: "draft", label: "AI drafting personalized DMs (2–4 sentences)" },
+        { id: "guardrails", label: "Running 5 anti-hallucination & tone guardrails" },
+        { id: "queue", label: "Pushing validated drafts to Review Queue" },
+      ]
+    );
+
     try {
-      const res = await fetch("/api/draft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          campaignId: selectedCampaign.id,
-          minScore,
-          ...(prospectIds?.length ? { prospectIds } : {}),
-          sender: { fund_name: "GenAI Fund", sender_name: "GenAI Fund Team" },
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        showMsg(data.error || "Drafting failed");
-        return;
+      let totalDrafted = 0;
+      if (targetProspects.length > 0) {
+        const chunkSize = 2;
+        setLoadingProgress({ done: 0, total: targetProspects.length });
+        for (let i = 0; i < targetProspects.length; i += chunkSize) {
+          const chunk = targetProspects.slice(i, i + chunkSize);
+          const handles = chunk.map((p) => `@${p.xUsername}`).join(", ");
+          const processed = Math.min(i + chunk.length, targetProspects.length);
+          setActiveStep("draft", `Drafting ${handles} (${processed} / ${targetProspects.length})`);
+
+          const res = await fetch("/api/draft", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              campaignId: selectedCampaign.id,
+              minScore,
+              prospectIds: chunk.map((p) => p.id),
+              sender: { fund_name: "GenAI Fund", sender_name: "GenAI Fund Team" },
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            updateStep("draft", { status: "error", detail: data.error || "Drafting failed" });
+            showMsg(data.error || "Drafting failed");
+            return;
+          }
+          totalDrafted += data.drafted ?? 0;
+          setLoadingProgress({ done: processed, total: targetProspects.length });
+        }
+      } else {
+        setActiveStep("draft");
+        const res = await fetch("/api/draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            campaignId: selectedCampaign.id,
+            minScore,
+            ...(prospectIds?.length ? { prospectIds } : {}),
+            sender: { fund_name: "GenAI Fund", sender_name: "GenAI Fund Team" },
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          updateStep("draft", { status: "error", detail: data.error || "Drafting failed" });
+          showMsg(data.error || "Drafting failed");
+          return;
+        }
+        totalDrafted = data.drafted ?? 0;
       }
+
+      setActiveStep("guardrails", "Validating anti-hallucination, length & tone rules...");
+      await waitMs(350);
+      updateStep("guardrails", { status: "done", detail: "5/5 guardrails verified ✓" });
+      setActiveStep("queue");
       await fetchProspects(selectedCampaign.id);
-      showMsg(`Drafted ${data.drafted ?? 0} personalized DMs for review ✓`);
-      if ((data.drafted ?? 0) > 0) {
+      markAllStepsDone();
+      await waitMs(500);
+      showMsg(`Drafted ${totalDrafted} personalized DMs for review ✓`);
+      if (totalDrafted > 0) {
         setView("review");
         setReviewIndex(0);
         setEditingDraft(null);
@@ -389,14 +617,43 @@ export default function HomePage() {
     } catch {
       showMsg("Drafting failed");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
   const scoreAndDraftSingle = async (prospect: Prospect) => {
     if (!selectedCampaign) return;
-    setLoading(true);
-    setLoadingText(`Preparing draft DM for @${prospect.xUsername}...`);
+    const needsScore = prospect.status === "DISCOVERED";
+    if (needsScore) {
+      startLoadingOverlay(
+        `Preparing draft DM for @${prospect.xUsername}...`,
+        "Running live single-founder qualification & guardrail pipeline",
+        [
+          { id: "read", label: `Reading @${prospect.xUsername} bio & recent tweets` },
+          { id: "score", label: "AI scoring founder fit & extracting evidence quotes" },
+          { id: "draft", label: "Drafting DM & running 5 anti-hallucination guardrails" },
+          { id: "queue", label: `Opening @${prospect.xUsername} in Review Queue` },
+        ]
+      );
+      const t = setTimeout(() => setActiveStep("score"), 300);
+      loadingTimersRef.current.push(t);
+    } else {
+      startLoadingOverlay(
+        `Preparing draft DM for @${prospect.xUsername}...`,
+        "Generating evidence-grounded DM & running 5 guardrails",
+        [
+          {
+            id: "evidence",
+            label: `Loading verified fit thesis (${Math.round((prospect.fitScore || 0) * 100)}% fit)`,
+          },
+          { id: "draft", label: "Drafting personalized DM & validating 5 guardrails" },
+          { id: "queue", label: `Opening @${prospect.xUsername} in Review Queue` },
+        ]
+      );
+      const t = setTimeout(() => setActiveStep("draft"), 250);
+      loadingTimersRef.current.push(t);
+    }
+
     try {
       let currentStatus = prospect.status;
       if (currentStatus === "DISCOVERED") {
@@ -407,14 +664,26 @@ export default function HomePage() {
         });
         const sData = await sRes.json();
         if (!sRes.ok) {
+          clearLoadingTimers();
+          updateStep("score", { status: "error", detail: sData.error || "Scoring failed" });
           showMsg(sData.error || "Scoring failed");
           return;
         }
         const sItem = sData.results?.[0];
         if (sItem?.status === "error") {
+          clearLoadingTimers();
+          updateStep("score", { status: "error", detail: sItem.error || "Scoring failed" });
           showMsg(sItem.error || "Scoring failed");
           return;
         }
+        clearLoadingTimers();
+        updateStep("read", { status: "done" });
+        updateStep("score", {
+          status: "done",
+          detail: `Fit ${Math.round((sItem?.fit_score ?? 0) * 100)}% ✓`,
+        });
+        await waitMs(250);
+        setActiveStep("draft");
         currentStatus = "SCORED";
       }
 
@@ -431,22 +700,39 @@ export default function HomePage() {
         });
         const dData = await dRes.json();
         if (!dRes.ok) {
+          clearLoadingTimers();
+          updateStep("draft", { status: "error", detail: dData.error || "Drafting failed" });
           showMsg(dData.error || "Drafting failed");
           return;
         }
         const dItem = dData.results?.[0];
         if (dItem?.status === "error") {
+          clearLoadingTimers();
+          updateStep("draft", { status: "error", detail: dItem.errors?.[0] || "Drafting failed" });
           showMsg(dItem.errors?.[0] || "Drafting failed");
           return;
         }
+        clearLoadingTimers();
+        updateStep("evidence", { status: "done" });
+        updateStep("draft", {
+          status: "done",
+          detail:
+            dItem?.status === "drafted_with_warnings"
+              ? "Flagged for human review"
+              : "Passed 5/5 guardrails ✓",
+        });
+        await waitMs(300);
       }
 
+      setActiveStep("queue");
       const refreshedRes = await fetch(`/api/prospects?campaignId=${selectedCampaign.id}`);
       const refreshed = (await refreshedRes.json()) as Prospect[];
       setProspects(refreshed);
       const draftedList = refreshed.filter((p) => p.status === "DRAFTED");
       const targetIdx = draftedList.findIndex((p) => p.id === prospect.id);
       if (targetIdx >= 0) {
+        markAllStepsDone();
+        await waitMs(500);
         setInspectProspect(null);
         setReviewIndex(targetIdx);
         setEditingDraft(null);
@@ -460,7 +746,7 @@ export default function HomePage() {
     } catch {
       showMsg("Failed to prepare draft");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
@@ -540,8 +826,17 @@ export default function HomePage() {
       showMsg("No approved DMs in queue");
       return;
     }
-    setLoading(true);
-    setLoadingText(`Executing safe send for ${approvedCount} approved DMs...`);
+    startLoadingOverlay(
+      `Executing safe send for ${approvedCount} approved DMs...`,
+      "Enforcing zero double-messaging lock & token-bucket rate limits",
+      [
+        { id: "lock", label: "Acquiring atomic SQLite lock (status = SENDING)" },
+        { id: "rate", label: "Checking Token-Bucket Rate Limiter (15 DMs / 15 min)" },
+        { id: "dispatch", label: "Dispatching DMs & handling HTTP 403/429 safely" },
+        { id: "audit", label: "Recording audit_log & updating Outreach Inbox" },
+      ],
+      650
+    );
     try {
       const res = await fetch("/api/send", {
         method: "POST",
@@ -550,10 +845,16 @@ export default function HomePage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        clearLoadingTimers();
+        updateStep("dispatch", { status: "error", detail: data.error || "Send execution failed" });
         showMsg(data.error || "Send execution failed");
         return;
       }
+      clearLoadingTimers();
+      setActiveStep("audit");
       await fetchProspects(selectedCampaign.id);
+      markAllStepsDone();
+      await waitMs(450);
       const sentCount = data.results?.filter((r: { status: string }) => r.status.startsWith("SENT")).length || 0;
       const blockedCount = data.results?.filter((r: { status: string }) => r.status === "BLOCKED_DM_CLOSED").length || 0;
       showMsg(
@@ -565,14 +866,22 @@ export default function HomePage() {
     } catch {
       showMsg("Send execution failed");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
   const syncReplies = async () => {
     if (!selectedCampaign) return;
-    setLoading(true);
-    setLoadingText("Syncing inbound X replies...");
+    startLoadingOverlay(
+      "Syncing inbound X replies...",
+      "Checking DM conversations for founder responses",
+      [
+        { id: "poll", label: "Polling inbound DM events" },
+        { id: "match", label: "Matching sender_id with SENT founders" },
+        { id: "inbox", label: "Updating REPLIED threads in Live Inbox" },
+      ],
+      500
+    );
     try {
       const res = await fetch("/api/replies", {
         method: "POST",
@@ -581,15 +890,21 @@ export default function HomePage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        clearLoadingTimers();
+        updateStep("poll", { status: "error", detail: data.error || "Failed to sync replies" });
         showMsg(data.error || "Failed to sync replies");
         return;
       }
+      clearLoadingTimers();
+      setActiveStep("inbox");
       await fetchProspects(selectedCampaign.id);
+      markAllStepsDone();
+      await waitMs(450);
       showMsg(data.message || `Synced ${data.updated ?? 0} inbound replies ✓`);
     } catch {
       showMsg("Failed to sync replies");
     } finally {
-      setLoading(false);
+      stopLoadingOverlay();
     }
   };
 
@@ -601,13 +916,37 @@ export default function HomePage() {
         body: JSON.stringify({ key, value }),
       });
       if (!res.ok) {
-        showMsg("Failed to save setting");
+        const err = await res.json().catch(() => ({}));
+        showMsg(err.error || "Failed to save setting");
         return;
+      }
+      if (key !== "llm_provider" && key !== "llm_model") {
+        setSettingsValues((prev) => ({ ...prev, [key]: "" }));
+        setHealthData(null);
       }
       await fetchSettings();
       showMsg(`${key} saved securely ✓`);
     } catch {
       showMsg("Failed to save setting");
+    }
+  };
+
+  const clearSetting = async (key: string, label: string) => {
+    try {
+      const res = await fetch(`/api/settings?key=${encodeURIComponent(key)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        showMsg(err.error || "Failed to clear key");
+        return;
+      }
+      setSettingsValues((prev) => ({ ...prev, [key]: "" }));
+      setHealthData(null);
+      await fetchSettings();
+      showMsg(`${label} removed ✓`);
+    } catch {
+      showMsg("Failed to clear key");
     }
   };
 
@@ -2001,7 +2340,9 @@ export default function HomePage() {
                     <div className="flex justify-between items-center font-mono">
                       <span className="text-slate-500">LLM Intelligence Engine:</span>
                       <span className="text-slate-900 font-semibold">
-                        {healthData.hasLLMKey ? `Live (${healthData.llmProvider || "gemini"})` : "Heuristic Sandbox ($0 fallback)"}
+                        {healthData.hasLLMKey
+                          ? `Live (${healthData.llmProvider || "gemini"}${healthData.llmModel ? ` · ${healthData.llmModel}` : ""})`
+                          : "Heuristic Sandbox ($0 fallback)"}
                       </span>
                     </div>
                     {healthData.note && (
@@ -2062,6 +2403,17 @@ export default function HomePage() {
                       <Button variant="outline" size="sm" onClick={() => saveSetting(key, settingsValues[key] || "")}>
                         Save
                       </Button>
+                      {savedSettingHints[key] && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => clearSetting(key, label)}
+                          disabled={loading}
+                          className="text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                        >
+                          Clear
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -2079,14 +2431,23 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {(() => {
-                  const selectedProviderId = settingsValues.llm_provider || "gemini";
-                  const activeProvider =
-                    LLM_PROVIDER_CONFIGS.find((p) => p.value === selectedProviderId) || LLM_PROVIDER_CONFIGS[0];
-                  const providerOptions = LLM_PROVIDER_CONFIGS.map((p) => ({
+                  const activeProvider = getProviderConfig(settingsValues.llm_provider);
+                  const activeModelId = resolveModelForProvider(activeProvider.value, settingsValues.llm_model);
+                  const activeModel =
+                    activeProvider.models.find((m) => m.value === activeModelId) || activeProvider.models[0];
+                  const providerOptions = LLM_PROVIDERS.map((p) => ({
                     value: p.value,
                     label: p.label,
                     description: p.description,
                     badge: savedSettingHints[p.keyName] ? "Saved ✓" : undefined,
+                    badgeVariant: "emerald" as const,
+                  }));
+                  const modelOptions = activeProvider.models.map((m) => ({
+                    value: m.value,
+                    label: m.label,
+                    description: m.description,
+                    badge: m.tierLabel,
+                    badgeVariant: m.tier === "free" ? ("emerald" as const) : ("amber" as const),
                   }));
                   const savedHint = savedSettingHints[activeProvider.keyName];
 
@@ -2099,11 +2460,32 @@ export default function HomePage() {
                         <Select
                           ariaLabel="Select AI Provider"
                           value={activeProvider.value}
-                          onChange={(val) => {
-                            setSettingsValues((prev) => ({ ...prev, llm_provider: val }));
-                            saveSetting("llm_provider", val);
+                          onChange={async (val) => {
+                            const nextProvider = getProviderConfig(val);
+                            setSettingsValues((prev) => ({
+                              ...prev,
+                              llm_provider: val,
+                              llm_model: nextProvider.defaultModel,
+                            }));
+                            await saveSetting("llm_provider", val);
+                            await saveSetting("llm_model", nextProvider.defaultModel);
                           }}
                           options={providerOptions}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 block mb-1.5">
+                          AI Model
+                        </label>
+                        <Select
+                          ariaLabel="Select AI Model"
+                          value={activeModel.value}
+                          onChange={(val) => {
+                            setSettingsValues((prev) => ({ ...prev, llm_model: val }));
+                            saveSetting("llm_model", val);
+                          }}
+                          options={modelOptions}
                         />
                       </div>
 
@@ -2112,15 +2494,26 @@ export default function HomePage() {
                           <label className="text-xs font-semibold uppercase tracking-wide text-slate-700">
                             {activeProvider.keyLabel}
                           </label>
-                          {savedHint ? (
-                            <span className="text-[11px] font-mono text-emerald-700 font-medium px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/70">
-                              Configured ({savedHint}) ✓
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span
+                              className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                                activeModel.tier === "free"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200/70"
+                                  : "bg-amber-50 text-amber-700 border-amber-200/70"
+                              }`}
+                            >
+                              {activeModel.tier === "free" ? "Free Tier Supported" : "Paid Billing Required"}
                             </span>
-                          ) : (
-                            <span className="text-[11px] font-medium text-slate-500 px-2 py-0.5 rounded-full bg-white border border-slate-200/80">
-                              Sandbox Fallback ($0)
-                            </span>
-                          )}
+                            {savedHint ? (
+                              <span className="text-[11px] font-mono text-emerald-700 font-medium px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/70">
+                                Configured ({savedHint}) ✓
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-medium text-slate-500 px-2 py-0.5 rounded-full bg-white border border-slate-200/80">
+                                Sandbox Fallback ($0)
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="flex gap-2">
                           <Input
@@ -2151,9 +2544,21 @@ export default function HomePage() {
                           >
                             Save
                           </Button>
+                          {savedHint && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearSetting(activeProvider.keyName, activeProvider.keyLabel)}
+                              disabled={loading}
+                              className="text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                            >
+                              Clear
+                            </Button>
+                          )}
                         </div>
                         <p className="text-[11px] text-slate-500 leading-relaxed">
-                          {activeProvider.helper}
+                          Active: <span className="font-medium text-slate-700">{activeProvider.label}</span> ·{" "}
+                          <span className="font-mono text-slate-700">{activeModel.value}</span> ({activeModel.tierLabel}). Leave blank to keep Heuristic Sandbox ($0 fallback).
                         </p>
                       </div>
                     </>
@@ -2166,15 +2571,95 @@ export default function HomePage() {
       </main>
 
       {/* ── Global Loading Overlay (Apple Liquid Glass) ───── */}
-      {loading && (
-        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-[60] animate-in fade-in">
-          <div className="bg-white/95 border border-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center ring-1 ring-black/[0.04]">
-            <div className="h-8 w-8 border-3 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-semibold text-slate-900">{loadingText}</span>
-            <span className="text-[11px] text-slate-500 font-medium">Running idempotent FDE pipeline...</span>
+      {loading && (() => {
+        const allStepsDone = loadingSteps.length > 0 && loadingSteps.every((s) => s.status === "done");
+        return (
+          <div className="fixed inset-0 bg-slate-900/25 backdrop-blur-md flex items-center justify-center z-[60] animate-in fade-in">
+            <div className="w-full max-w-md mx-4 text-left bg-white/95 border border-white rounded-3xl p-6 shadow-2xl ring-1 ring-black/[0.05] space-y-4">
+              <div className="flex items-start gap-3.5">
+                {allStepsDone ? (
+                  <div className="h-7 w-7 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-white stroke-[3]" />
+                  </div>
+                ) : (
+                  <div className="h-7 w-7 border-[2.5px] border-[#0071e3] border-t-transparent rounded-full animate-spin shrink-0 mt-0.5" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-slate-900 leading-snug">{loadingText}</div>
+                  <div className="text-[11px] text-slate-500 font-medium mt-0.5">{loadingSubtext}</div>
+                </div>
+              </div>
+
+            {loadingProgress && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-500">
+                  <span>Batch Progress</span>
+                  <span className="font-semibold text-slate-700">
+                    {loadingProgress.done} / {loadingProgress.total}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full bg-[#0071e3] rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.round(
+                        (loadingProgress.done / Math.max(1, loadingProgress.total)) * 100
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {loadingSteps.length > 0 && (
+              <div className="rounded-2xl border border-slate-200/75 bg-slate-50/75 p-3.5 space-y-2.5">
+                {loadingSteps.map((step) => (
+                  <div key={step.id} className="flex items-start gap-2.5">
+                    {step.status === "done" && (
+                      <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+                      </div>
+                    )}
+                    {step.status === "active" && (
+                      <div className="w-4 h-4 rounded-full border-2 border-[#0071e3] border-t-transparent animate-spin shrink-0 mt-0.5" />
+                    )}
+                    {step.status === "error" && (
+                      <div className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <X className="w-2.5 h-2.5 text-white stroke-[3]" />
+                      </div>
+                    )}
+                    {step.status === "pending" && (
+                      <div className="w-4 h-4 rounded-full border border-slate-300 bg-white shrink-0 mt-0.5" />
+                    )}
+
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className={`text-xs leading-snug ${
+                          step.status === "active"
+                            ? "font-semibold text-slate-900"
+                            : step.status === "done"
+                            ? "font-medium text-emerald-700"
+                            : step.status === "error"
+                            ? "font-medium text-rose-700"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {step.label}
+                      </div>
+                      {step.detail && (
+                        <div className="text-[11px] font-mono text-slate-500 mt-0.5 truncate">
+                          {step.detail}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

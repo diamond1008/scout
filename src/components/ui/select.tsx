@@ -9,7 +9,14 @@ export interface SelectOption {
   label: string;
   description?: string;
   badge?: string;
+  badgeVariant?: "emerald" | "amber" | "slate";
 }
+
+const BADGE_CLASSES: Record<"emerald" | "amber" | "slate", string> = {
+  emerald: "bg-emerald-50 text-emerald-700 border-emerald-200/70",
+  amber: "bg-amber-50 text-amber-700 border-amber-200/70",
+  slate: "bg-slate-100 text-slate-600 border-slate-200/80",
+};
 
 interface SelectProps {
   value: string;
@@ -79,7 +86,12 @@ export function Select({
         </span>
         <span className="flex items-center gap-1.5 shrink-0">
           {selected?.badge && (
-            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+            <span
+              className={cn(
+                "text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-full border",
+                BADGE_CLASSES[selected.badgeVariant || "emerald"]
+              )}
+            >
               {selected.badge}
             </span>
           )}
@@ -132,7 +144,12 @@ export function Select({
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {option.badge && (
-                      <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                      <span
+                        className={cn(
+                          "text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border",
+                          BADGE_CLASSES[option.badgeVariant || "emerald"]
+                        )}
+                      >
                         {option.badge}
                       </span>
                     )}

@@ -1,28 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { campaigns, prospects, settings } from "@/lib/db/schema";
+import { campaigns, prospects } from "@/lib/db/schema";
+import { getSettingsMap } from "@/lib/db/settings-helper";
 import { eq, and, inArray } from "drizzle-orm";
-import { GeminiProvider } from "@/lib/providers/llm/gemini";
-import { OpenAIProvider } from "@/lib/providers/llm/openai";
-import { AnthropicProvider } from "@/lib/providers/llm/anthropic";
-import type { ILLMProvider, SegmentContext } from "@/lib/providers/llm/types";
+import type { SegmentContext } from "@/lib/providers/llm/types";
 import type { UserProfile } from "@/lib/providers/x/types";
-import { HeuristicSandboxProvider } from "@/lib/providers/llm/heuristic-sandbox";
-
-function createLLMProvider(provider: string, apiKey: string): ILLMProvider {
-  if (!apiKey) {
-    return new HeuristicSandboxProvider();
-  }
-  switch (provider) {
-    case "openai":
-      return new OpenAIProvider(apiKey);
-    case "anthropic":
-      return new AnthropicProvider(apiKey);
-    case "gemini":
-    default:
-      return new GeminiProvider(apiKey);
-  }
-}
+import { resolveLLMFromSettings } from "@/lib/providers/llm/factory";
 
 export async function POST(req: NextRequest) {
   const db = getDb();
@@ -81,20 +64,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Get LLM config
-  const allSettings = await db.select().from(settings).all();
-  const settingsMap = Object.fromEntries((allSettings as any[]).map((s) => [s.key, s.value]));
-
-  const llmProvider = settingsMap.llm_provider || "gemini";
-  const keyMap: Record<string, string | undefined> = {
-    gemini: settingsMap.google_api_key || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-    openai: settingsMap.openai_api_key || process.env.OPENAI_API_KEY,
-    anthropic: settingsMap.anthropic_api_key || process.env.ANTHROPIC_API_KEY,
-  };
-  const rawKey = keyMap[llmProvider] || "";
-  const apiKey = rawKey.trim().replace(/^['"]+|['"]+$/g, "");
-
-  // Use configured live provider or fallback to zero-config Sandbox engine
-  const llm = createLLMProvider(llmProvider, apiKey);
+  const settingsMap = await getSettingsMap();
+  const { llm } = resolveLLMFromSettings(settingsMap);
 
   const candidateRows = await db
     .select()

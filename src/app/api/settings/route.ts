@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { upsertSetting } from "@/lib/db/settings-helper";
@@ -51,6 +52,31 @@ export async function POST(req: NextRequest) {
   await upsertSetting(key, normalizedValue);
 
   // Any edit to X credentials invalidates prior Live verification until re-tested
+  if (X_TOKEN_KEYS.has(key)) {
+    await upsertSetting("x_live_verified", "");
+  }
+
+  return NextResponse.json({ success: true });
+}
+
+export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const key = searchParams.get("key");
+
+  if (!key) {
+    return NextResponse.json({ error: "Missing key" }, { status: 400 });
+  }
+
+  if (key === "x_live_verified") {
+    return NextResponse.json(
+      { error: "x_live_verified is managed automatically by API Health Diagnostics" },
+      { status: 400 }
+    );
+  }
+
+  const db = getDb();
+  await db.delete(settings).where(eq(settings.key, key)).run();
+
   if (X_TOKEN_KEYS.has(key)) {
     await upsertSetting("x_live_verified", "");
   }
