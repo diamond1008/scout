@@ -85,6 +85,75 @@ const SCORE_FILTER_OPTIONS = [
   { value: "0.4", label: "Relevant (≥ 40%)" },
 ] as const;
 
+const GUARDRAIL_BANNED_PHRASES = [
+  "pick your brain",
+  "stumbled upon",
+  "came across your amazing",
+  "thought leader",
+  "synergy",
+  "circle back",
+  "low-hanging fruit",
+  "touch base",
+  "deep dive into",
+  "leverage your expertise",
+  "paradigm shift",
+  "move the needle",
+  "I'm a huge fan",
+  "I've been following your work",
+] as const;
+
+const GUARDRAIL_FAMILIARITY_SOURCES = [
+  "we met at",
+  "great meeting you",
+  "as we discussed",
+  "as per our conversation",
+  "following up on our",
+  "nice to meet you at",
+  "remember when we",
+] as const;
+
+const GUARDRAIL_FAMILIARITY_PATTERNS = GUARDRAIL_FAMILIARITY_SOURCES.map(
+  (p) => new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+);
+
+function splitDraftWithWarnings(text: string): {
+  segments: { text: string; flagged: boolean }[];
+  flaggedPhrases: string[];
+} {
+  if (!text) return { segments: [], flaggedPhrases: [] };
+  const allTerms = [...GUARDRAIL_BANNED_PHRASES, ...GUARDRAIL_FAMILIARITY_SOURCES];
+  const pattern = allTerms
+    .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const rx = new RegExp(pattern, "gi");
+  const segments: { text: string; flagged: boolean }[] = [];
+  const seen = new Set<string>();
+  const flaggedPhrases: string[] = [];
+
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
+  while ((match = rx.exec(text)) !== null) {
+    if (match[0].length === 0) {
+      rx.lastIndex++;
+      continue;
+    }
+    if (match.index > lastIdx) {
+      segments.push({ text: text.slice(lastIdx, match.index), flagged: false });
+    }
+    segments.push({ text: match[0], flagged: true });
+    const norm = match[0].toLowerCase();
+    if (!seen.has(norm)) {
+      seen.add(norm);
+      flaggedPhrases.push(match[0]);
+    }
+    lastIdx = match.index + match[0].length;
+  }
+  if (lastIdx < text.length) {
+    segments.push({ text: text.slice(lastIdx), flagged: false });
+  }
+  return { segments, flaggedPhrases };
+}
+
 type LoadingStepStatus = "pending" | "active" | "done" | "error";
 interface LoadingStep {
   id: string;
@@ -124,6 +193,7 @@ export default function HomePage() {
   // Review state
   const [reviewIndex, setReviewIndex] = useState(0);
   const [editingDraft, setEditingDraft] = useState<string | null>(null);
+  const draftBackdropRef = useRef<HTMLDivElement>(null);
 
   // Discovery inspection modal
   const [inspectProspect, setInspectProspect] = useState<Prospect | null>(null);
@@ -786,6 +856,26 @@ export default function HomePage() {
     [selectedCampaign, editingDraft, fetchProspects]
   );
 
+  const draftedProspectsCount = useMemo(
+    () => prospects.filter((p) => p.status === "DRAFTED").length,
+    [prospects]
+  );
+
+  const skipReview = useCallback(
+    (direction: 1 | -1 = 1) => {
+      if (draftedProspectsCount <= 1) {
+        showMsg("Only 1 draft left in queue — Approve or Reject it.");
+        return;
+      }
+      setEditingDraft(null);
+      setReviewIndex((prev) => {
+        const cur = Math.min(prev, draftedProspectsCount - 1);
+        return (cur + direction + draftedProspectsCount) % draftedProspectsCount;
+      });
+    },
+    [draftedProspectsCount]
+  );
+
   // ── Keyboard shortcuts for Review Queue ───────────────────
   useEffect(() => {
     if (view !== "review") return;
@@ -806,18 +896,16 @@ export default function HomePage() {
         handleApproval(current.id, "reject");
       } else if (e.key === " " || e.key === "ArrowRight") {
         e.preventDefault();
-        setEditingDraft(null);
-        setReviewIndex((prev) => Math.min(prev + 1, Math.max(0, drafted.length - 1)));
+        skipReview(1);
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        setEditingDraft(null);
-        setReviewIndex((prev) => Math.max(prev - 1, 0));
+        skipReview(-1);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [view, reviewIndex, prospects, handleApproval]);
+  }, [view, reviewIndex, prospects, handleApproval, skipReview]);
 
   const sendApproved = async () => {
     if (!selectedCampaign) return;
@@ -994,43 +1082,29 @@ export default function HomePage() {
         noCliches: true,
         withinLimit: true,
         needsReviewFlag: false,
+        segments: [] as { text: string; flagged: boolean }[],
+        flaggedPhrases: [] as string[],
       };
     }
     const lower = activeDraftText.toLowerCase();
-    const banned = [
-      "pick your brain",
-      "stumbled upon",
-      "came across your amazing",
-      "thought leader",
-      "synergy",
-      "circle back",
-      "low-hanging fruit",
-      "touch base",
-      "deep dive into",
-      "leverage your expertise",
-      "paradigm shift",
-      "move the needle",
-      "i'm a huge fan",
-      "i've been following your work",
-    ];
-    const fam = [
-      /we met at/i,
-      /great meeting you/i,
-      /as we discussed/i,
-      /as per our conversation/i,
-      /following up on our/i,
-      /nice to meet you at/i,
-      /remember when we/i,
-    ];
+    const { segments, flaggedPhrases } = splitDraftWithWarnings(activeDraftText);
     const hasEvidence =
       Boolean(currentReview.evidenceSources && currentReview.evidenceSources.length > 0) &&
       activeDraftText.trim().length > 20 &&
       lower.includes("genai");
-    const noCliches = !banned.some((b) => lower.includes(b));
-    const noFamiliarity = !fam.some((rx) => rx.test(activeDraftText));
+    const noCliches = !GUARDRAIL_BANNED_PHRASES.some((b) => lower.includes(b.toLowerCase()));
+    const noFamiliarity = !GUARDRAIL_FAMILIARITY_PATTERNS.some((rx) => rx.test(activeDraftText));
     const withinLimit = activeDraftText.trim().length > 0 && activeDraftText.length <= 500;
     const needsReviewFlag = activeDraftText.startsWith("[NEEDS REVIEW]");
-    return { hasEvidence, noFamiliarity, noCliches, withinLimit, needsReviewFlag };
+    return {
+      hasEvidence,
+      noFamiliarity,
+      noCliches,
+      withinLimit,
+      needsReviewFlag,
+      segments,
+      flaggedPhrases,
+    };
   }, [currentReview, activeDraftText]);
 
   // Filtered prospects for Discovery view
@@ -1136,7 +1210,7 @@ export default function HomePage() {
 
       {/* ── Apple Liquid Glass Top Navigation ────────────── */}
       <header className="border-b border-white/60 bg-white/70 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 xl:py-0 xl:h-16 flex flex-wrap xl:flex-nowrap items-center justify-between gap-x-4 gap-y-2.5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 py-2.5 xl:py-0 xl:h-16 flex flex-wrap xl:flex-nowrap items-center justify-between gap-x-3 gap-y-2.5">
           {/* Brand Identity - No background on icon */}
           <div className="flex items-center gap-2.5 shrink-0">
             <Compass className="h-7 w-7 text-[#0071e3] shrink-0 stroke-[2.2]" />
@@ -1151,9 +1225,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Segmented Pill Navigation - wraps cleanly below xl, scrollable on narrow viewports */}
-          <nav className="order-3 xl:order-2 w-full xl:w-auto flex items-center overflow-x-auto max-w-full">
-            <div className="flex items-center gap-1 bg-slate-200/50 backdrop-blur-xl p-1 rounded-2xl border border-white/80 shadow-inner mx-auto flex-nowrap">
+          {/* Segmented Pill Navigation - wraps cleanly below xl, fits cleanly at xl+ without scrollbar */}
+          <nav className="order-3 xl:order-2 w-full xl:w-auto xl:shrink-0 flex items-center overflow-x-auto xl:overflow-visible max-w-full">
+            <div className="flex items-center gap-0.5 bg-slate-200/50 backdrop-blur-xl p-1 rounded-2xl border border-white/80 shadow-inner mx-auto flex-nowrap">
               {[
                 { id: "campaigns", label: "Campaigns", icon: Layers },
                 { id: "discovery", label: "Discovery & Fit", icon: Compass, count: stats.discovered },
@@ -1164,7 +1238,7 @@ export default function HomePage() {
                 <button
                   key={id}
                   onClick={() => setView(id as View)}
-                  className={`flex items-center gap-1.5 px-3 xl:px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap shrink-0 transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 2xl:px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap shrink-0 transition-all ${
                     view === id
                       ? "bg-white/95 text-slate-900 shadow-sm shadow-slate-900/5 font-semibold"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/40"
@@ -1173,7 +1247,7 @@ export default function HomePage() {
                   <Icon className="w-3.5 h-3.5 shrink-0 text-slate-500" />
                   <span className="whitespace-nowrap">{label}</span>
                   {count !== undefined && count > 0 && (
-                    <span className="ml-1 text-[11px] font-semibold text-slate-400 whitespace-nowrap">
+                    <span className="ml-0.5 text-[11px] font-semibold text-slate-400 whitespace-nowrap">
                       ({count})
                     </span>
                   )}
@@ -1186,8 +1260,8 @@ export default function HomePage() {
           <div className="order-2 xl:order-3 flex items-center gap-3 shrink-0">
             {selectedCampaign && (
               <div className="flex items-center gap-2 border border-white/80 rounded-2xl px-2.5 sm:px-3 py-1.5 bg-white/70 backdrop-blur-md shadow-2xs text-xs whitespace-nowrap shrink-0">
-                <span className="hidden sm:inline text-slate-500 whitespace-nowrap">Radar:</span>
-                <span className="hidden sm:inline font-semibold text-slate-900 truncate max-w-[110px] xl:max-w-[130px] whitespace-nowrap">
+                <span className="hidden 2xl:inline text-slate-500 whitespace-nowrap">Radar:</span>
+                <span className="hidden sm:inline font-semibold text-slate-900 truncate max-w-[96px] 2xl:max-w-[130px] whitespace-nowrap">
                   {selectedCampaign.name}
                 </span>
                 <button
@@ -1986,14 +2060,42 @@ export default function HomePage() {
                         </div>
                       )}
 
-                      {/* Textarea */}
-                      <Textarea
-                        rows={7}
-                        value={activeDraftText}
-                        onChange={(e) => setEditingDraft(e.target.value)}
-                        className="font-sans text-sm leading-relaxed bg-slate-50/70 border-slate-200/90 focus:bg-white text-slate-900"
-                        placeholder="Draft message will appear here..."
-                      />
+                      {/* Textarea with synchronized red wavy underline backdrop for flagged warning phrases */}
+                      <div className="relative rounded-xl border border-slate-200/90 bg-slate-50/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/25 focus-within:border-[#0071e3] transition-all overflow-hidden">
+                        <div
+                          ref={draftBackdropRef}
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 overflow-y-auto px-3.5 py-2.5 font-sans text-sm leading-relaxed whitespace-pre-wrap break-words text-transparent"
+                        >
+                          {liveGuardrails.segments.map((seg, idx) =>
+                            seg.flagged ? (
+                              <mark
+                                key={idx}
+                                className="bg-rose-100/70 text-transparent underline decoration-wavy decoration-rose-500 decoration-[1.5px] underline-offset-2 rounded-[3px]"
+                              >
+                                {seg.text}
+                              </mark>
+                            ) : (
+                              <span key={idx} className="text-transparent">
+                                {seg.text}
+                              </span>
+                            )
+                          )}
+                          {"\n "}
+                        </div>
+                        <textarea
+                          rows={7}
+                          value={activeDraftText}
+                          onChange={(e) => setEditingDraft(e.target.value)}
+                          onScroll={(e) => {
+                            if (draftBackdropRef.current) {
+                              draftBackdropRef.current.scrollTop = e.currentTarget.scrollTop;
+                            }
+                          }}
+                          className="relative z-10 block w-full h-[176px] resize-none overflow-y-auto border-0 bg-transparent px-3.5 py-2.5 font-sans text-sm leading-relaxed text-slate-900 caret-slate-900 placeholder:text-slate-400 focus:outline-none"
+                          placeholder="Draft message will appear here..."
+                        />
+                      </div>
 
                       {/* Live Guardrail Checklist */}
                       <div
@@ -2028,6 +2130,15 @@ export default function HomePage() {
                             Length & anti-duplicate OK
                           </span>
                         </div>
+                        {liveGuardrails.flaggedPhrases.length > 0 && (
+                          <div className="pt-1.5 mt-1 border-t border-amber-200/60 text-[11px] text-rose-700">
+                            Flagged phrase(s):{" "}
+                            <span className="font-mono font-semibold">
+                              {liveGuardrails.flaggedPhrases.map((p) => `"${p}"`).join(", ")}
+                            </span>{" "}
+                            — Soft warning only; you can still edit or approve as human override.
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </div>
@@ -2036,10 +2147,7 @@ export default function HomePage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        setEditingDraft(null);
-                        setReviewIndex(Math.min(safeReviewIndex + 1, Math.max(0, draftedProspects.length - 1)));
-                      }}
+                      onClick={() => skipReview(1)}
                       className="gap-1.5"
                     >
                       Skip [Space]
